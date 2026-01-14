@@ -1,5 +1,5 @@
 {
-  "name": "nuxt-graphql-listing",
+  "name": "@fritill-team/nuxt-graphql-listing",
   "version": "1.0.0",
   "description": "My new Nuxt module",
   "repository": "your-org/my-module",
@@ -23,6 +23,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "scripts": {
     "prepack": "nuxt-module-build build",
     "dev": "npm run dev:prepare && nuxi dev playground",
