@@ -37,6 +37,8 @@ const emit = defineEmits<{
   (e: 'update:offset', offset: number): void
 }>()
 
+const { t } = useListingI18n()
+
 
 const mobileFiltersOpen = ref(false)
 const viewMode = ref<'grid' | 'list'>('grid')
@@ -116,8 +118,8 @@ function onFilterChange(patch: Record<string, any>) {
           <slot name="error" :error="error">
             <ListingErrorState
               :error="error"
-              :title="$t('listing.errorTitle')"
-              :retry-text="$t('listing.retry')"
+              :title="t('listing.errorTitle')"
+              :retry-text="t('listing.retry')"
               @retry="$emit('update:offset', 0)"
             />
           </slot>
@@ -134,9 +136,9 @@ function onFilterChange(patch: Record<string, any>) {
         <template v-else-if="items.length === 0">
           <slot name="empty">
             <ListingEmpty
-              :title="$t('listing.empty.title')"
-              :description="$t('listing.empty.description')"
-              :action-text="$t('listing.empty.resetFilters')"
+              :title="t('listing.empty.title')"
+              :description="t('listing.empty.description')"
+              :action-text="t('listing.empty.resetFilters')"
               @action="() => {
                     $emit('update:filters', {} as any)
                     $emit('update:offset', 0)
@@ -158,9 +160,9 @@ function onFilterChange(patch: Record<string, any>) {
 
         <div class="flex items-center justify-between gap-2 mt-6" v-if="!loading && items.length > 0">
           <div class="flex flex-wrap gap-2 text-sm text-neutral dark:text-gray-300 font-medium">
-            <span v-text="$t('listing.pagination', {page: page, pageCount: pageCount})"/>
+            <span v-text="t('listing.pagination', {page: page, pageCount: pageCount})"/>
             <span class="">•</span>
-            <span v-if="!loading" v-text="$t('listing.results', {from, to, total})"/>
+            <span v-if="!loading" v-text="t('listing.results', {from, to, total})"/>
           </div>
           <div class="flex gap-2">
             <UPagination

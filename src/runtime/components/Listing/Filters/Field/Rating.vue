@@ -7,7 +7,7 @@ const props = defineProps<{
 	filters: Record<string, any>
 }>()
 
-const {t} = useI18n()
+const { t } = useListingI18n()
 
 const emit = defineEmits<{
 	(e: "change", patch: Record<string, any>): void
@@ -43,7 +43,7 @@ const radioOptions = computed(() => [
 	})),
 	{
 		value: null,
-		label: t("filters.rating.any"),
+		label: t("listing.rating.any"),
 	},
 ])
 

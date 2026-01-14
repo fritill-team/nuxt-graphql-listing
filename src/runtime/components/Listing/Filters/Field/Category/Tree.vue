@@ -26,12 +26,11 @@ const props = defineProps<{
 	field: CategoryTreeFilterFieldConfig<string>
 	filters: Record<string, any>
 	facetOptions?: FacetCategory[]
-	locale?: string
 }>()
 
 const emit = defineEmits<{ (e: 'change', patch: Record<string, any>): void }>()
 
-const { locale } = useI18n()
+const { locale, t } = useListingI18n()
 
 function buildTrees(cats: FacetCategory[] | undefined): Record<string, Node[]> {
 	const out: Record<string, Node[]> = {}
@@ -136,13 +135,13 @@ function onSelect(slug: string) {
 <template>
 	<div>
 		<div class="flex items-center justify-between mb-2">
-			<span class="text-sm font-semibold">{{ field.label || $t('listing.categories') }}</span>
+			<span class="text-sm font-semibold">{{ field.label || t('listing.categories') }}</span>
 			<UButton size="xs" color="neutral" variant="ghost" @click="clearSelection" :disabled="!selected">
-				{{ $t('listing.clear') }}
+				{{ t('listing.clear') }}
 			</UButton>
 		</div>
 		<div v-if="!facetOptions || facetOptions.length === 0" class="text-sm text-neutral-500">
-			{{ $t('listing.noCategories') }}
+			{{ t('listing.noCategories') }}
 		</div>
 		<div v-else class="text-sm">
 			<template v-for="(nodes, treeId) in trees" :key="treeId as string">

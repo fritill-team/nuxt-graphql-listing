@@ -5,6 +5,10 @@ export default {
     clear: 'مسح',
     cancel: "إلغاء",
     reset: "إعادة ضبط",
+    categories: 'التصنيفات',
+    noCategories: 'لا توجد تصنيفات متاحة',
+    expand: 'توسيع',
+    collapse: 'طي',
     toggleViewMode: 'تغيير طريقة العرض',
     range: {
       min: 'الحد الأدنى',

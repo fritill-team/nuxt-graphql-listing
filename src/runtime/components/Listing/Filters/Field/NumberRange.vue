@@ -13,6 +13,8 @@ const emit = defineEmits<{
 	(e: 'change', patch: Record<string, any>): void
 }>()
 
+const { t } = useListingI18n()
+
 // Computed bounds from facets (with fallbacks)
 const minBound = computed(() => props.facetMin ?? 0)
 const maxBound = computed(() => props.facetMax ?? 1000)
@@ -87,7 +89,7 @@ function onClear() {
 		<div class="flex gap-3">
 			<div class="flex-1 space-y-1">
 				<label class="text-xs text-gray-500 dark:text-gray-400">
-					{{ $t("listing.range.min") }}
+					{{ t("listing.range.min") }}
 				</label>
 				<UInput
 					v-model.number="localGte"
@@ -101,7 +103,7 @@ function onClear() {
 
 			<div class="flex-1 space-y-1">
 				<label class="text-xs text-gray-500 dark:text-gray-400">
-					{{ $t("listing.range.max") }}
+					{{ t("listing.range.max") }}
 				</label>
 				<UInput
 					v-model.number="localLte"
@@ -124,10 +126,10 @@ function onClear() {
 
 		<div class="flex justify-end gap-2">
 			<UButton variant="ghost" size="xs" @click="onClear">
-				{{ $t("listing.clear") }}
+				{{ t("listing.clear") }}
 			</UButton>
 			<UButton variant="soft" color="primary" size="xs" @click="onSubmit">
-				{{ $t("listing.apply") }}
+				{{ t("listing.apply") }}
 			</UButton>
 		</div>
 	</div>

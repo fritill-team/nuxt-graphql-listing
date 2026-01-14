@@ -10,6 +10,8 @@ const emit = defineEmits<{
 	(e: 'change', patch: Record<string, any>): void
 }>()
 
+const { t } = useListingI18n()
+
 // current selected values for this single field (array from filters / URL)
 const selectedValues = computed<(string | number | boolean)[]>(() => {
 	const raw = props.filters[props.field.field]
@@ -61,7 +63,7 @@ function clearAll() {
 				size="xs"
 				@click="clearAll"
 			>
-				{{ $t('listing.clear') }}
+				{{ t('listing.clear') }}
 			</UButton>
 		</div>
 

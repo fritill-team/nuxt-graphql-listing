@@ -200,14 +200,12 @@ export function buildListingQuery<
       const value = f[paramKey]
 
       if (value == null || value === '') {
-        delete q[paramKey]
         continue
       }
 
       if (field.kind === 'boolean-select') {
         if (value === true) q[paramKey] = 'true'
         else if (value === false) q[paramKey] = 'false'
-        else delete q[paramKey]
       } else {
         q[paramKey] = String(value)
       }
@@ -220,7 +218,6 @@ export function buildListingQuery<
         const value = f[key]
         if (value === true) q[key] = 'true'
         else if (value === false) q[key] = 'false'
-        else delete q[key]
       }
       continue
     }
@@ -237,12 +234,7 @@ export function buildListingQuery<
 
       if (v && (v.gte != null || v.lte != null)) {
         if (v.gte != null) q[minKey] = v.gte
-        else delete q[minKey]
         if (v.lte != null) q[maxKey] = v.lte
-        else delete q[maxKey]
-      } else {
-        delete q[minKey]
-        delete q[maxKey]
       }
       continue
     }
@@ -254,8 +246,6 @@ export function buildListingQuery<
       const minKey = `${base}Min`
       if (v && v.gte != null && v.gte !== '') {
         q[minKey] = v.gte
-      } else {
-        delete q[minKey]
       }
       continue
     }
@@ -269,12 +259,7 @@ export function buildListingQuery<
 
         if (v && (v.gte != null || v.lte != null)) {
           if (v.gte != null) q[fromKey] = v.gte
-          else delete q[fromKey]
           if (v.lte != null) q[toKey] = v.lte
-          else delete q[toKey]
-        } else {
-          delete q[fromKey]
-          delete q[toKey]
         }
       }
       continue

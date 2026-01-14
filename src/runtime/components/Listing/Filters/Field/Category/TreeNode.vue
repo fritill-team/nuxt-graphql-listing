@@ -14,9 +14,10 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-	(e: 'toggle', key: string): void
-	(e: 'select', id: string): void
+	(e: 'toggle' | 'select', value: string): void
 }>()
+
+const { t } = useListingI18n()
 
 const hasChildren = computed(() => props.node.children && props.node.children.length > 0)
 const isExpanded = computed(() => props.expanded[props.pathKey] ?? true)
@@ -41,7 +42,7 @@ function select() {
 				v-if="hasChildren"
 				type="button"
 				class="inline-flex text-xs px-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-				:aria-label="isExpanded ? $t('listing.collapse') : $t('listing.expand')"
+				:aria-label="isExpanded ? t('listing.collapse') : t('listing.expand')"
 				@click="toggle"
 			>
 				<UIcon

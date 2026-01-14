@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ['../src/module', '@nuxt/ui', '@nuxt/image', '@nuxtjs/i18n'],
+  modules: ['../src/module', '@nuxt/ui', '@nuxt/image'],
 
   devtools: {enabled: true},
 

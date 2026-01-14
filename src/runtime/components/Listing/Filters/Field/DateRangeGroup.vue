@@ -11,6 +11,8 @@ const emit = defineEmits<{
 	(e: 'change', patch: Record<string, any>): void
 }>()
 
+const { t } = useListingI18n()
+
 // ------------ ACTIVE FIELD (radio) ------------
 const activeField = ref<string>('') // ← starts empty
 
@@ -240,7 +242,7 @@ const inputDateRef = useTemplateRef('inputDateRef')
 					variant="ghost"
 					@click="clearGroup"
 				>
-					{{ $t("listing.clear") }}
+					{{ t("listing.clear") }}
 				</UButton>
 				<UButton
 					size="xs"
@@ -248,7 +250,7 @@ const inputDateRef = useTemplateRef('inputDateRef')
 					color="primary"
 					@click="applyRange"
 				>
-					{{ $t("listing.apply") }}
+					{{ t("listing.apply") }}
 				</UButton>
 			</div>
 		</div>

@@ -15,7 +15,7 @@ const props = withDefaults(defineProps<{
   hasGridSwitch?: boolean
   viewMode?: ViewMode
   sortConfig: SortOption<string>[]
-  sort: Array<SortInput> | null
+  sort?: Array<SortInput> | null
   sortLabel?: string
   filters: TFilters
   filtersConfig: FilterFieldConfig<string>[]
@@ -30,6 +30,8 @@ const emit = defineEmits<{
   (e: 'update:sort', sort: Array<SortInput>): void
   (e: 'update:filters', filters: Partial<TFilters>): void
 }>()
+
+const { t } = useListingI18n()
 const viewMode = computed({
   get: () => props.viewMode,
   set: (v) => emit('update:viewMode', v)
@@ -64,7 +66,7 @@ const onSort = (newSort: Array<SortInput>): void => emit('update:sort', newSort)
       <slot name="before-end"/>
       <ViewModeSwitch v-if="hasGridSwitch"
                       v-model="viewMode"
-                      :label="$t('listing.toggleViewMode')"/>
+                      :label="t('listing.toggleViewMode')"/>
       <UButton
         icon="i-lucide-filter"
         size="lg"

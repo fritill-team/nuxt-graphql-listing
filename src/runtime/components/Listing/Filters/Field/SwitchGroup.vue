@@ -10,6 +10,8 @@ const emit = defineEmits<{
 	(e: "change", patch: Record<string, any>): void
 }>()
 
+const { t } = useListingI18n()
+
 // Toggle handler for a single switch
 function onToggle(fieldKey: string, checked: boolean) {
 	// When OFF → send null to remove from URL filters
@@ -42,7 +44,7 @@ function clearAll() {
 				size="xs"
 				@click="clearAll"
 			>
-				{{ $t("listing.clear") }}
+				{{ t("listing.clear") }}
 			</UButton>
 		</div>
 

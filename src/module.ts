@@ -1,7 +1,6 @@
 import {
   addComponentsDir,
   addImportsDir,
-  addTemplate,
   createResolver,
   defineNuxtModule,
 } from '@nuxt/kit'
@@ -21,7 +20,6 @@ export default defineNuxtModule<ModuleOptions>({
     autoImports: true,
   },
   moduleDependencies: {
-    '@nuxtjs/i18n': {},
     '@nuxt/ui': {},
   },
 
@@ -46,27 +44,5 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.build.transpile ||= []
     nuxt.options.build.transpile.push(runtimeDir)
 
-    // ✅ Capture template outputs
-    const enTpl = addTemplate({
-      filename: 'nuxt-graphql-listing/i18n/locales/en.ts',
-      src: resolver.resolve('./runtime/i18n/locales/en.ts'),
-    })
-    const arTpl = addTemplate({
-      filename: 'nuxt-graphql-listing/i18n/locales/ar.ts',
-      src: resolver.resolve('./runtime/i18n/locales/ar.ts'),
-    })
-
-    // ✅ Register using the template filenames (real .nuxt paths)
-
-    nuxt.hook('i18n:registerModule', (register) => {
-      register({
-        // ✅ absolute path to the folder that actually exists in your module
-        langDir: resolver.resolve('./runtime/i18n/locales'),
-        locales: [
-          { code: 'en', file: 'en.ts' },
-          { code: 'ar', file: 'ar.ts' },
-        ],
-      })
-    })
   },
 })

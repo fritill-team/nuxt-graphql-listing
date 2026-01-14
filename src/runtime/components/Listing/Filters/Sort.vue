@@ -13,7 +13,7 @@ const emit = defineEmits<{
 	(e: 'change', sort: Array<{ field: string; direction: SortDirection }>): void
 }>()
 
-const { t } = useI18n()
+const { t } = useListingI18n()
 
 // Create a unique key for each sort option (field:direction)
 function optionKey(opt: SortOption<string>): string {
