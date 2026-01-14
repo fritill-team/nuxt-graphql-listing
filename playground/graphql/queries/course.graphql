@@ -1,0 +1,77 @@
+query CourseDetails($input: CourseListInput!) {
+  courses(coursesInput: $input) {
+    items {
+      id
+      rating
+      reviewsCount
+      isLive
+      numberOfChapters
+      numberOfLessons
+      durationSeconds
+      prices {
+        compareAtAmountCents
+        discountPercentage
+        hasDiscount
+        id
+        amount
+        amountCents
+        currency
+        discountedPrice
+        displayPrice
+        isFree
+        compareAtPrice
+        savingAmount
+      }
+      chapters {
+        id
+        durationFormatted
+        durationSeconds
+        numberOfLessons
+        order
+        translations {
+          description
+          id
+          title
+          language
+        }
+      }
+      lessons {
+        durationFormatted
+        durationSeconds
+        id
+        orderInCourse
+        orderInChapter
+        translations {
+          description
+          id
+          language
+          title
+        }
+        type
+        assets {
+          assetId
+          assetType
+        }
+        chapterId
+      }
+      translations {
+        slug
+        title
+        language
+        description
+        id
+        metadata
+      }
+      category {
+			  categoryId
+        pathText
+        treeId
+        translations { language name slug }
+      }
+      assets {
+        assetId
+        assetType
+      }
+    }
+  }
+}
