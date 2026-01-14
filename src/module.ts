@@ -1,6 +1,7 @@
 import {
   addComponentsDir,
   addImportsDir,
+  addTemplate,
   createResolver,
   defineNuxtModule,
 } from '@nuxt/kit'
@@ -20,6 +21,7 @@ export default defineNuxtModule<ModuleOptions>({
     autoImports: true,
   },
   moduleDependencies: {
+    '@nuxtjs/i18n': {},
     '@nuxt/ui': {},
   },
 
@@ -43,6 +45,25 @@ export default defineNuxtModule<ModuleOptions>({
 
     nuxt.options.build.transpile ||= []
     nuxt.options.build.transpile.push(runtimeDir)
+
+    addTemplate({
+      filename: 'nuxt-graphql-listing/i18n/locales/en.ts',
+      src: resolver.resolve('./runtime/i18n/locales/en.ts'),
+    })
+    addTemplate({
+      filename: 'nuxt-graphql-listing/i18n/locales/ar.ts',
+      src: resolver.resolve('./runtime/i18n/locales/ar.ts'),
+    })
+
+    nuxt.hook('i18n:registerModule', (register) => {
+      register({
+        langDir: resolver.resolve('./runtime/i18n/locales'),
+        locales: [
+          { code: 'en', file: 'en.ts' },
+          { code: 'ar', file: 'ar.ts' },
+        ],
+      })
+    })
 
   },
 })

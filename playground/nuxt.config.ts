@@ -1,5 +1,13 @@
 export default defineNuxtConfig({
-  modules: ['../src/module', '@nuxt/ui'],
+  modules: ['../src/module', '@nuxt/ui', '@nuxtjs/i18n'],
+
+  i18n: {
+    defaultLocale: 'en',
+    locales: [
+      { code: 'en', name: 'English' },
+      { code: 'ar', name: 'Arabic' },
+    ],
+  },
 
   devtools: {enabled: true},
 
