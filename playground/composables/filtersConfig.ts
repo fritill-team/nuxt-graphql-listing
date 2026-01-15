@@ -1,7 +1,6 @@
-import type {CourseFilterInput, SortDirection} from "~/types/generated";
-import type {FilterFieldConfig} from "../../src/runtime/types/filterSchema";
-import type {SortOption} from "../../src/runtime/types/sortSchema";
-import type {CourseSort} from "~/types/listing";
+import type { CourseFilterInput, SortDirection } from '~/types/generated'
+import type { FilterFieldConfig, SortOption } from '../../src/runtime/types/listing'
+import type { CourseSort } from '~/types/listing'
 
 
 export type CourseFilterField = keyof CourseFilterInput

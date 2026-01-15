@@ -5,10 +5,7 @@ import type { DocumentNode } from 'graphql/index'
 // Sort Types
 // ============================================
 
-export enum SortDirection {
-  ASC = 'ASC',
-  DESC = 'DESC',
-}
+export type SortDirection = 'ASC' | 'DESC'
 
 export interface SortInput<F extends string = string> {
   field: F
@@ -141,29 +138,55 @@ export interface ListingResult<Item, Facets = Record<string, any>> {
 }
 
 export interface UseListingOptions<
-  Item,
-  RawData,
-  Variables,
-  Filters,
-  Sort,
+  Item = any,
+  Filters = Record<string, any>,
+  Sort = SortInput[],
   Facets = Record<string, any>,
 > {
-  queryDocument: DocumentNode
-  apolloClient: ApolloClient
-  buildVariables: (state: ListingState<Filters, Sort>) => Variables
-  mapResult: (data: RawData) => ListingResult<Item, Facets>
+  /** GraphQL query document */
+  query: DocumentNode
+
+  /** Apollo client instance */
+  client: ApolloClient
+
+  /**
+   * Path to the data in GraphQL response (e.g., 'products' for { products: { items, total } })
+   * The response at this path should have: items, total, and optionally facets
+   */
+  dataPath: string
+
+  /** Initial filter values */
+  initialFilters?: Partial<Filters>
+
+  /** Initial sort configuration */
+  initialSort?: Sort
+
+  /** Initial offset for pagination (default: 0) */
   initialOffset?: number
+
+  /** Initial limit for pagination (default: 20) */
   initialLimit?: number
-  initialFilters: Partial<Filters>
-  initialSort: Sort
-  urlBinding?: boolean
-  parseQuery?: (query: Record<string, any>) => Partial<ListingState<Filters, Sort>>
-  buildQuery?: (
-    state: ListingState<Filters, Sort>,
-    previousQuery: Record<string, any>,
-  ) => Record<string, any>
+
+  /**
+   * Filter field configurations for URL binding
+   * When provided, enables automatic URL sync
+   */
+  filterConfig?: FilterFieldConfig[]
+
+  /** Unique key for useAsyncData (default: 'listing') */
   key?: string
-  sortMode?: 'array' | 'keyed'
+
+  /** Key name for filters in GraphQL variables (default: 'filters') */
+  filterKey?: string
+
+  /** Wrap variables in { input: ... } (default: true) */
+  wrapInput?: boolean
+
+  /**
+   * Custom result mapper (advanced)
+   * Override auto-mapping from dataPath
+   */
+  mapResult?: (data: any) => ListingResult<Item, Facets>
 }
 
 export interface UseListingReturn<Item, Filters, Sort, Facets = Record<string, any>> {
