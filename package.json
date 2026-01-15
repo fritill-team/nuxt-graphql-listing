@@ -10,6 +10,26 @@
     ".": {
       "types": "./dist/types.d.mts",
       "import": "./dist/module.mjs"
+    },
+    "./runtime/*": {
+      "types": "./runtime/*.d.ts",
+      "import": "./runtime/*.js"
+    },
+    "./runtime/*/*": {
+      "types": "./runtime/*/*.d.ts",
+      "import": "./runtime/*/*.js"
+    },
+    "./runtime/*/*/*": {
+      "types": "./runtime/*/*/*.d.ts",
+      "import": "./runtime/*/*/*.js"
+    },
+    "./runtime/*/*/*/*": {
+      "types": "./runtime/*/*/*/*.d.ts",
+      "import": "./runtime/*/*/*/*.js"
+    },
+    "./composables/*": {
+      "types": "./runtime/composables/*.d.ts",
+      "import": "./runtime/composables/*.js"
     }
   },
   "main": "./dist/module.mjs",

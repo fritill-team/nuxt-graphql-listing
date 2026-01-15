@@ -32,18 +32,14 @@ export default defineNuxtModule<ModuleOptions>({
     const packagedRuntimeDir = resolver.resolve('../runtime')
     const resolvedRuntimeDir = existsSync(packagedRuntimeDir) ? packagedRuntimeDir : runtimeDir
 
-    if (options.components !== false) {
-      addComponentsDir({
-        path: resolve(resolvedRuntimeDir, 'components'),
-        global: true,
-        pathPrefix: true,
-      })
-    }
+    addComponentsDir({
+      path: resolve(resolvedRuntimeDir, 'components'),
+      global: true,
+      pathPrefix: true,
+    })
 
-    if (options.autoImports !== false) {
-      addImportsDir(resolve(resolvedRuntimeDir, 'composables'))
-      addImportsDir(resolvedRuntimeDir)
-    }
+    addImportsDir(resolve(resolvedRuntimeDir, 'composables'))
+    addImportsDir(resolvedRuntimeDir)
 
     nuxt.options.build.transpile ||= []
     nuxt.options.build.transpile.push(resolvedRuntimeDir)
