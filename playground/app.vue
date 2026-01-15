@@ -15,6 +15,7 @@ const items = computed<NavigationMenuItem[][]>(() => {
 
   return [
     [
+      {label: 'Home', to: localePath('/')} ,
       {label: 'Docs', to: localePath('/docs')},
       {label: 'Playground', to: localePath('/playground')},
       isAuthenticated.value
