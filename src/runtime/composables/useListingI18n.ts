@@ -35,12 +35,14 @@ export function useListingI18n() {
     return 'en'
   })
 
+  const getMessages = (): Messages =>
+    (messages[locale.value] ?? messages.en) as Messages
+
   const t = (key: string, params?: Params) => {
     if (typeof i18n?.t === 'function') {
       return i18n.t(key, params)
     }
-    const active = messages[locale.value] ?? messages.en
-    const resolved = resolvePath(active, key)
+    const resolved = resolvePath(getMessages(), key)
     return resolved ? formatMessage(resolved, params) : key
   }
 
