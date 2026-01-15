@@ -34,7 +34,6 @@ export default defineNuxtModule<ModuleOptions>({
 
     if (options.autoImports !== false) {
       addImportsDir(resolver.resolve('runtime/composables'))
-      addImportsDir(runtimeDir)
     }
 
     nuxt.options.build.transpile ||= []

@@ -9,6 +9,7 @@ import {
 } from "~/types/generated";
 import {type CourseFilters, type CourseSort, defaultCourseFilters} from "~/types/listing";
 import type { ApolloClient } from '@apollo/client/core'
+import {buildListingQuery, parseListingQuery} from "../../src/runtime/utils";
 
 
 function useCoursesListing() {
