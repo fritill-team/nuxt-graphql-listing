@@ -3,9 +3,9 @@ import ViewModeSwitch from "./ViewModeSwitch.vue";
 import {computed} from "vue";
 import Drawer from "./Filters/Drawer.vue";
 import Sort from "./Filters/Sort.vue";
-import type {FilterFieldConfig} from "../../types/listing";
-import type {SortDirection, SortOption} from "../../types/listing";
+import type {FilterFieldConfig, SortDirection, SortOption} from "../../types/listing";
 import {useOverlay} from "#imports";
+import { useListingI18n } from "../../composables";
 
 
 type ViewMode = "list" | "grid"
@@ -31,7 +31,7 @@ const emit = defineEmits<{
   (e: 'update:filters', filters: Partial<TFilters>): void
 }>()
 
-const { t } = useListingI18n()
+const {t} = useListingI18n()
 const viewMode = computed({
   get: () => props.viewMode,
   set: (v) => emit('update:viewMode', v)
