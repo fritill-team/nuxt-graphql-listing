@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SortDirection, SortOption } from '../../../types/sortSchema'
+import type { SortDirection, SortOption } from '../../../types/listing'
 import type { SortFieldInput } from '#layers/courses/types/generated'
 
 const props = defineProps<{

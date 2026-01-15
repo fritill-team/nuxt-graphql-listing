@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="TItem, TFilters, TSort, TFacets">
-import type {FilterFieldConfig} from "../../types/filterSchema";
-import type {SortDirection, SortOption} from "../../types/sortSchema";
+import type {FilterFieldConfig} from "../../types/listing";
+import type {SortDirection, SortOption} from "../../types/listing";
 import {computed, ref} from "vue"
 import Topbar from "./Topbar.vue";
 

@@ -5,6 +5,11 @@ import {
   defineNuxtModule,
 } from '@nuxt/kit'
 
+// Re-export runtime utilities for explicit imports
+export * from './runtime/utils'
+export { useListing } from './runtime/composables/useListing'
+export * from './runtime/types/listing'
+
 export interface ModuleOptions {
   components?: boolean
   autoImports?: boolean

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SwitchMultiFilterFieldConfig } from '../../../../types/filterSchema'
+import type { SwitchMultiFilterFieldConfig } from '../../../../types/listing'
 
 const props = defineProps<{
 	field: SwitchMultiFilterFieldConfig<string>

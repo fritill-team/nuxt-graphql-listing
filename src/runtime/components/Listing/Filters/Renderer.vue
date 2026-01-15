@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="TFilters, TFacets">
-import type {FilterFieldConfig} from "../../../types/filterSchema"
+import type {FilterFieldConfig} from "../../../types/listing"
 
 import Select from "./Field/Select.vue"
 import DateRangeGroup from "./Field/DateRangeGroup.vue"

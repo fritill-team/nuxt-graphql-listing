@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {CategoryTreeFilterFieldConfig} from '../../../../../types/filterSchema'
+import type {CategoryTreeFilterFieldConfig} from '../../../../../types/listing'
 import CategoryTreeNode from './TreeNode.vue'
 
 interface FacetCategory {

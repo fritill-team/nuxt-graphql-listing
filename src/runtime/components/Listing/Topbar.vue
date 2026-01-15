@@ -3,8 +3,8 @@ import ViewModeSwitch from "./ViewModeSwitch.vue";
 import {computed} from "vue";
 import Drawer from "./Filters/Drawer.vue";
 import Sort from "./Filters/Sort.vue";
-import type {FilterFieldConfig} from "../../types/filterSchema";
-import type {SortDirection, SortOption} from "../../types/sortSchema";
+import type {FilterFieldConfig} from "../../types/listing";
+import type {SortDirection, SortOption} from "../../types/listing";
 import {useOverlay} from "#imports";
 
 

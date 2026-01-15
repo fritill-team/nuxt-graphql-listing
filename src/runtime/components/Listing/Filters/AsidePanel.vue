@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {FilterFieldConfig} from "../../../types/filterSchema"
+import type {FilterFieldConfig} from "../../../types/listing"
 
 const props = withDefaults(defineProps<{
   title?: string

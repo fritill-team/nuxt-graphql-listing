@@ -1,6 +1,4 @@
-import type {FilterFieldConfig} from './types/filterSchema'
-import type {ListingState} from './types/listing'
-import type {SortDirection} from './types/sortSchema'
+import type { FilterFieldConfig, ListingState, SortDirection } from '../types/listing'
 
 type AnyFilters = Record<string, any>
 

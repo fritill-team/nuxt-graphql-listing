@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {DateTimeRangeGroupFilterFieldConfig} from "../../../../types/filterSchema";
+import type {DateTimeRangeGroupFilterFieldConfig} from "../../../../types/listing";
 import {CalendarDate, getLocalTimeZone, parseDate, today} from "@internationalized/date";
 
 const props = defineProps<{

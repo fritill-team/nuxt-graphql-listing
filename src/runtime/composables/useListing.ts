@@ -1,4 +1,3 @@
-import {useAsyncData, useRoute, useRouter} from "#app";
 import type {ListingResult, ListingState, UseListingOptions, UseListingReturn} from "../types/listing";
 import {deepEqual, normalizeQuery} from "../utils";
 import {computed, type Ref, ref, watch} from "vue";

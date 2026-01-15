@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {RangeFilterFieldConfig} from "../../../../types/filterSchema";
+import type {RangeFilterFieldConfig} from "../../../../types/listing";
 
 const props = defineProps<{
 	field: RangeFilterFieldConfig<string>   // kind: 'datetime-range'

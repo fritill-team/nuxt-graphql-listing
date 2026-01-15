@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="TFilters, TFacets">
 import Renderer from "./Renderer.vue"
-import type {FilterFieldConfig} from "../../../types/filterSchema"
+import type {FilterFieldConfig} from "../../../types/listing"
 import {ref, toRaw, watch} from "vue"
 
 const props = withDefaults(defineProps<{

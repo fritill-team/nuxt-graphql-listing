@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {BaseFilterFieldConfig} from "../../../../types/filterSchema"
+import type {BaseFilterFieldConfig} from "../../../../types/listing"
 
 const props = defineProps<{
 	// you can swap this for a dedicated RatingFilterFieldConfig later

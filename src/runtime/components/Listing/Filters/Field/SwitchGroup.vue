@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SwitchGroupFilterFieldConfig } from "../../../../types/filterSchema";
+import type { SwitchGroupFilterFieldConfig } from "../../../../types/listing";
 
 const props = defineProps<{
 	field: SwitchGroupFilterFieldConfig<string>
