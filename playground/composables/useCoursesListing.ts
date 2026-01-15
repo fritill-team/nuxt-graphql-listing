@@ -8,11 +8,12 @@ import {
   type SortDirection
 } from "~/types/generated";
 import {type CourseFilters, type CourseSort, defaultCourseFilters} from "~/types/listing";
+import type { ApolloClient } from '@apollo/client/core'
 
 
 function useCoursesListing() {
   const filterConfig = useCourseFilterConfig()
-  const { $courses } = useNuxtApp()
+  const { $courses } = useNuxtApp() as unknown as { $courses: ApolloClient }
 
   return useListing<
     CoursesQuery['courses']['items'][number],
