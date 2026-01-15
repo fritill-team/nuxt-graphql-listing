@@ -19,6 +19,10 @@ export default defineNuxtModule<ModuleOptions>({
     components: true,
     autoImports: true,
   },
+  moduleDependencies: {
+    '@nuxtjs/i18n': {},
+    '@nuxt/ui': {},
+  },
 
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
