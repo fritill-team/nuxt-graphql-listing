@@ -15,7 +15,7 @@ const items = computed<NavigationMenuItem[][]>(() => {
 
   return [
     [
-      {label: 'Docs', to: localePath('/')},
+      {label: 'Docs', to: localePath('/docs')},
       {label: 'Playground', to: localePath('/playground')},
       isAuthenticated.value
         ? {label: 'Sign out', icon: 'i-lucide-log-out', onSelect: handleSignOut}
