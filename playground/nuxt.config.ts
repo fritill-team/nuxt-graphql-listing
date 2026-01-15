@@ -9,8 +9,18 @@ export default defineNuxtConfig({
     ],
   },
 
-  devtools: {enabled: true},
+  content: {
+    build: {
+      markdown: {
+        toc: {
+          depth: 3,
+          searchDepth: 3
+        }
+      }
+    }
+  },
 
+  devtools: {enabled: true},
 
   css: ['../assets/css/main.css'],
   runtimeConfig: {
