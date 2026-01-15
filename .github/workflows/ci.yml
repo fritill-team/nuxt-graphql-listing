@@ -43,7 +43,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Prepare
-        run: nuxi prepare
+        run: npx nuxi prepare
 
       - name: Test
         run: yarn test
