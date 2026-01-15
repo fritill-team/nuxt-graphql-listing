@@ -17,7 +17,7 @@
     "preview": "nuxt preview .playground",
     "prepack": "nuxt-module-build build",
     "lint": "eslint .",
-    "test": "vitest run",
+    "test": "nuxi prepare && vitest run",
     "codegen": "graphql-codegen --config playground/codegen.ts"
   },
   "dependencies": {
