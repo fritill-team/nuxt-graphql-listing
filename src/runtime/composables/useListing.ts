@@ -11,11 +11,14 @@ function defaultBuildVariables<Filters, Sort>(
   state: ListingState<Filters, Sort>,
   filterKey: string,
   wrapInput: boolean,
+  extraFilters: Partial<Filters>,
 ): any {
+  const mergedFilters = { ...state.filters, ...extraFilters }
+
   const variables: Record<string, any> = {
     offset: state.offset,
     limit: state.limit,
-    [filterKey]: state.filters,
+    [filterKey]: mergedFilters,
     sort: convertSortToKeyed(state.sort),
   }
 
@@ -68,6 +71,7 @@ export function useListing<
     key = 'listing',
     filterKey = 'filters',
     wrapInput = true,
+    extraFilters = {} as Partial<Filters>,
     mapResult: customMapResult,
   } = options
 
@@ -111,7 +115,7 @@ export function useListing<
 
   // ---------- Build variables ----------
   const variables = computed(() =>
-    defaultBuildVariables(state.value, filterKey, wrapInput),
+    defaultBuildVariables(state.value, filterKey, wrapInput, extraFilters),
   )
 
   // ---------- Map result ----------

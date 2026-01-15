@@ -182,6 +182,9 @@ export interface UseListingOptions<
   /** Wrap variables in { input: ... } (default: true) */
   wrapInput?: boolean
 
+  /** Extra filters to merge with state filters (not synced to URL) */
+  extraFilters?: Partial<Filters>
+
   /**
    * Custom result mapper (advanced)
    * Override auto-mapping from dataPath
