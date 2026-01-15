@@ -5,37 +5,18 @@
   "repository": "your-org/my-module",
   "license": "MIT",
   "packageManager": "yarn@1.22.22",
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/types.d.mts",
-      "import": "./dist/module.mjs"
-    }
-  },
-  "main": "./dist/module.mjs",
-  "typesVersions": {
-    "*": {
-      ".": [
-        "./dist/types.d.mts"
-      ]
-    }
-  },
-  "files": [
-    "dist"
-  ],
+  "main": "./nuxt.config.ts",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
-    "prepack": "nuxt-module-build build",
-    "dev": "npm run dev:prepare && nuxi dev playground",
-    "dev:build": "nuxi build playground",
-    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
-    "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
+    "dev": "nuxi dev .playground",
+    "dev:prepare": "nuxt prepare .playground",
+    "build": "nuxt build .playground",
+    "generate": "nuxt generate .playground",
+    "preview": "nuxt preview .playground",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:watch": "vitest watch",
-    "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit",
     "codegen": "graphql-codegen --config playground/codegen.ts"
   },
   "dependencies": {
