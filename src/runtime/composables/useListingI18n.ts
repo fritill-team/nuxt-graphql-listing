@@ -1,5 +1,5 @@
-import en from '../i18n/locales/en'
-import ar from '../i18n/locales/ar'
+import en from '../i18n/locales/en.json'
+import ar from '../i18n/locales/ar.json'
 
 type Messages = Record<string, any>
 type Params = Record<string, string | number>
