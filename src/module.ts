@@ -4,8 +4,6 @@ import {
   createResolver,
   defineNuxtModule,
 } from '@nuxt/kit'
-import { existsSync } from 'node:fs'
-import { resolve } from 'node:path'
 
 export interface ModuleOptions {
   components?: boolean
@@ -21,40 +19,25 @@ export default defineNuxtModule<ModuleOptions>({
     components: true,
     autoImports: true,
   },
-  moduleDependencies: {
-    '@nuxtjs/i18n': {},
-    '@nuxt/ui': {},
-  },
 
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
     const runtimeDir = resolver.resolve('runtime')
-    const packagedRuntimeDir = resolver.resolve('../runtime')
-    const resolvedRuntimeDir = existsSync(packagedRuntimeDir) ? packagedRuntimeDir : runtimeDir
 
-    addComponentsDir({
-      path: resolve(resolvedRuntimeDir, 'components'),
-      global: true,
-      pathPrefix: true,
-    })
+    if (options.components !== false) {
+      addComponentsDir({
+        path: resolver.resolve('runtime/components'),
+        global: true,
+        pathPrefix: true,
+      })
+    }
 
-    addImportsDir(resolve(resolvedRuntimeDir, 'composables'))
-    addImportsDir(resolvedRuntimeDir)
+    if (options.autoImports !== false) {
+      addImportsDir(resolver.resolve('runtime/composables'))
+      addImportsDir(runtimeDir)
+    }
 
     nuxt.options.build.transpile ||= []
-    nuxt.options.build.transpile.push(resolvedRuntimeDir)
-
-    // Register i18n locales
-    const localesDir = resolve(resolvedRuntimeDir, 'i18n/locales')
-
-    nuxt.hook('i18n:registerModule', (register) => {
-      register({
-        langDir: localesDir,
-        locales: [
-          { code: 'en', file: 'en.json' },
-          { code: 'ar', file: 'ar.json' },
-        ],
-      })
-    })
+    nuxt.options.build.transpile.push(runtimeDir)
   },
 })

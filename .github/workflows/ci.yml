@@ -11,18 +11,73 @@ on:
       - main
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Test
+        run: yarn test
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build Nuxt module
+        run: yarn prepack
+
   tag:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: [lint, test, build]
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      new_tag: ${{ steps.tag.outputs.tag }}
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Create next patch tag
+      - name: Bump version and create next patch tag
+        id: tag
         shell: bash
         run: |
           set -euo pipefail
@@ -41,10 +96,28 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          npm version "${major}.${minor}.${patch}" --no-git-tag-version
+          git add package.json
+          if [ -f yarn.lock ]; then
+            git add yarn.lock
+          fi
+          git commit -m "chore(release): ${new_tag}"
+          git push origin HEAD:main
           git tag "${new_tag}"
           git push origin "${new_tag}"
           echo "tag=${new_tag}" >> "$GITHUB_OUTPUT"
-        id: tag
+
+  release:
+    if: needs.tag.outputs.new_tag != ''
+    needs: tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.tag.outputs.new_tag }}
 
       - uses: actions/setup-node@v4
         with:
@@ -54,9 +127,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-
-      - name: Nuxt prepare
-        run: npx nuxi prepare
 
       - name: Build Nuxt module
         run: yarn prepack
@@ -64,91 +134,29 @@ jobs:
       - name: Create dist archive
         run: tar -czf dist.tar.gz dist
 
-      - name: Create or update GitHub release with dist archive
+      - name: Create GitHub release with dist archive
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          set -euo pipefail
-          tag="${{ steps.tag.outputs.tag }}"
-          if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" dist.tar.gz --clobber
-          else
-            gh release create "$tag" dist.tar.gz -t "$tag" -n ""
-          fi
-
-  lint:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - run: corepack enable
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Lint
-        run: yarn lint
-
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - run: corepack enable
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Playground prepare
-        run: yarn dev:prepare
-
-      - name: Test
-        run: yarn test
-
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - run: corepack enable
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Nuxt prepare
-        run: npx nuxi prepare
-
-      - name: Build Nuxt module
-        run: yarn prepack
+          tag="${{ needs.tag.outputs.new_tag }}"
+          gh release create "$tag" dist.tar.gz -t "$tag" -n "Release $tag"
 
   publish:
+    if: needs.tag.outputs.new_tag != ''
+    needs: tag
     runs-on: ubuntu-latest
-    needs: build
     permissions:
       contents: read
       packages: write
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.tag.outputs.new_tag }}
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 20
           registry-url: https://npm.pkg.github.com
 
       - run: corepack enable
@@ -156,24 +164,8 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Nuxt prepare
-        run: npx nuxi prepare
-
       - name: Build Nuxt module
         run: yarn prepack
-
-      - name: Set package version from latest tag
-        shell: bash
-        run: |
-          set -euo pipefail
-          git fetch --tags --force
-          latest_tag="$(git tag -l 'v*.*.*' --sort=-v:refname | head -n 1)"
-          if [ -z "${latest_tag}" ]; then
-            echo "No version tag found. Skipping publish."
-            exit 0
-          fi
-          version="${latest_tag#v}"
-          npm version "${version}" --no-git-tag-version
 
       - name: Publish to GitHub Packages
         run: npm publish

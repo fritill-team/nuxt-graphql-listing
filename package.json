@@ -1,8 +1,11 @@
 {
   "name": "@fritill-team/nuxt-graphql-listing",
   "version": "1.0.0",
-  "description": "My new Nuxt module",
-  "repository": "your-org/my-module",
+  "description": "A Nuxt module for building listing interfaces with GraphQL, featuring filtering, sorting, pagination, and URL state management",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fritill-team/nuxt-graphql-listing.git"
+  },
   "license": "MIT",
   "packageManager": "yarn@1.22.22",
   "type": "module",
@@ -10,64 +13,34 @@
     ".": {
       "types": "./dist/types.d.mts",
       "import": "./dist/module.mjs"
-    },
-    "./runtime/*": {
-      "types": "./runtime/*.d.ts",
-      "import": "./runtime/*.js"
-    },
-    "./runtime/*/*": {
-      "types": "./runtime/*/*.d.ts",
-      "import": "./runtime/*/*.js"
-    },
-    "./runtime/*/*/*": {
-      "types": "./runtime/*/*/*.d.ts",
-      "import": "./runtime/*/*/*.js"
-    },
-    "./runtime/*/*/*/*": {
-      "types": "./runtime/*/*/*/*.d.ts",
-      "import": "./runtime/*/*/*/*.js"
-    },
-    "./composables/*": {
-      "types": "./runtime/composables/*.d.ts",
-      "import": "./runtime/composables/*.js"
     }
   },
   "main": "./dist/module.mjs",
-  "typesVersions": {
-    "*": {
-      ".": [
-        "./dist/types.d.mts"
-      ]
-    }
-  },
+  "types": "./dist/types.d.mts",
   "files": [
-    "dist",
-    "runtime"
+    "dist"
   ],
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
-    "dev": "nuxi dev .playground",
-    "dev:prepare": "nuxt prepare .playground",
-    "build": "nuxt build .playground",
-    "generate": "nuxt generate .playground",
-    "preview": "nuxt preview .playground",
+    "dev": "nuxi dev playground",
+    "dev:prepare": "nuxt prepare playground",
+    "build": "nuxt build playground",
+    "generate": "nuxt generate playground",
+    "preview": "nuxt preview playground",
     "prepack": "nuxt-module-build build",
     "lint": "eslint .",
-    "test": "nuxi prepare && vitest run",
+    "test": "nuxi prepare test/fixtures/basic && vitest run",
     "codegen": "graphql-codegen --config playground/codegen.ts"
   },
   "dependencies": {
+    "@nuxt/kit": "^4.2.2"
+  },
+  "devDependencies": {
     "@apollo/client": "^4.0.9",
     "@graphql-codegen/cli": "^6.1.1",
     "@internationalized/date": "^3.10.0",
-    "@nuxt/kit": "^4.2.2",
-    "better-sqlite3": "^12.6.0",
-    "graphql": "^16.12.0",
-    "rxjs": "^7.8.2"
-  },
-  "devDependencies": {
     "@nuxt/content": "3.10.0",
     "@nuxt/devtools": "^3.1.1",
     "@nuxt/eslint-config": "^1.12.1",
@@ -77,19 +50,24 @@
     "@nuxt/ui": "4.3.0",
     "@nuxtjs/i18n": "9.3.3",
     "@types/node": "latest",
+    "better-sqlite3": "^12.6.0",
     "changelogen": "^0.6.2",
     "eslint": "^9.39.2",
+    "graphql": "^16.12.0",
     "nuxt": "^4.2.2",
     "typescript": "~5.9.3",
     "vitest": "^4.0.16",
     "vue-tsc": "^3.2.2"
   },
   "peerDependencies": {
-    "@apollo/client": "^4.0.9",
-    "@internationalized/date": "^3.10.0",
-    "@nuxt/ui": "^4.2.0",
-    "@nuxtjs/i18n": "9.3.3",
-    "better-sqlite3": "^12.6.0",
-    "graphql": "^16.12.0"
+    "@apollo/client": "^4.0.0",
+    "@internationalized/date": "^3.0.0",
+    "@nuxt/ui": "^4.0.0",
+    "graphql": "^16.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@nuxtjs/i18n": {
+      "optional": true
+    }
   }
 }
