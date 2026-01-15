@@ -134,6 +134,9 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Prepare
+        run: npx nuxi prepare
+
       - name: Build Nuxt module
         run: yarn prepack
 
@@ -169,6 +172,9 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Prepare
+        run: npx nuxi prepare
 
       - name: Build Nuxt module
         run: yarn prepack
