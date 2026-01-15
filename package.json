@@ -5,7 +5,25 @@
   "repository": "your-org/my-module",
   "license": "MIT",
   "packageManager": "yarn@1.22.22",
-  "main": "./nuxt.config.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/types.d.mts",
+      "import": "./dist/module.mjs"
+    }
+  },
+  "main": "./dist/module.mjs",
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/types.d.mts"
+      ]
+    }
+  },
+  "files": [
+    "dist",
+    "runtime"
+  ],
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
