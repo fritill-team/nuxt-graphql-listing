@@ -15,6 +15,7 @@
     "build": "nuxt build .playground",
     "generate": "nuxt generate .playground",
     "preview": "nuxt preview .playground",
+    "prepack": "nuxt-module-build build",
     "lint": "eslint .",
     "test": "vitest run",
     "codegen": "graphql-codegen --config playground/codegen.ts"
