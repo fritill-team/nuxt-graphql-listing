@@ -2,6 +2,7 @@
 import type {SortDirection, FilterFieldConfig,SortOption} from "../../types/listing";
 import {computed, ref} from "vue"
 import Topbar from "./Topbar.vue";
+import { useListingI18n } from "../../composables/useListingI18n";
 
 const props = defineProps<{
   // Filter

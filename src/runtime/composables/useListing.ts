@@ -54,8 +54,8 @@ function defaultMapResult<Item, Facets>(data: any, dataPath: string): ListingRes
 
 export function useListing<
   Item = any,
-  Filters = Record<string, any>,
-  Sort = SortInput[],
+  Filters extends Record<string, any> = Record<string, any>,
+  Sort extends SortInput[] = SortInput[],
   Facets = Record<string, any>,
 >(
   options: UseListingOptions<Item, Filters, Sort, Facets>,
@@ -93,7 +93,11 @@ export function useListing<
   // ---------- Hydrate state from URL ----------
   let hydratedState: Partial<ListingState<Filters, Sort>> = {}
   if (urlBinding && filterConfig) {
-    hydratedState = parseListingQuery(route.query as Record<string, any>, filterConfig) || {}
+    hydratedState =
+      parseListingQuery<string, Filters, Sort>(
+        route.query as Record<string, any>,
+        filterConfig,
+      ) || {}
   }
 
   const offset = ref<number>(hydratedState.offset ?? initialOffset)
@@ -152,9 +156,11 @@ export function useListing<
   // Refetch on variable changes
   watch(variables, () => fetchData(), {deep: true})
 
-  const items = computed<Item[]>(() => data.value?.items ?? [])
+  const items = computed<Item[]>(() => (data.value?.items ?? []) as Item[])
   const total = computed<number>(() => data.value?.total ?? 0)
-  const facets = computed<Facets | null | undefined>(() => data.value?.facets)
+  const facets = computed<Facets | null | undefined>(
+    () => data.value?.facets as Facets | null | undefined,
+  )
 
   // ---------- URL binding ----------
   let internalUpdate = false

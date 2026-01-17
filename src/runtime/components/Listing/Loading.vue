@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useListingI18n } from '../../composables/useListingI18n'
+
 const { t } = useListingI18n()
 </script>
 

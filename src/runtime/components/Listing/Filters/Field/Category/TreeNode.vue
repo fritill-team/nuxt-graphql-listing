@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useListingI18n } from '../../../../../composables/useListingI18n'
+
 type Node = {
 	name: string;
 	slug: string;

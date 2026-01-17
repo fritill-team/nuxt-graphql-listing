@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SwitchGroupFilterFieldConfig } from "../../../../types/listing";
+import { useListingI18n } from '../../../../composables/useListingI18n'
 
 const props = defineProps<{
 	field: SwitchGroupFilterFieldConfig<string>

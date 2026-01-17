@@ -1,3 +1,5 @@
+import { computed } from 'vue'
+import { useNuxtApp, useAppConfig } from '#imports'
 import en from '../i18n/locales/en'
 import ar from '../i18n/locales/ar'
 
@@ -9,13 +11,20 @@ const defaultMessages: Record<string, Messages> = {
   ar,
 }
 
-function deepMerge(target: Messages, source: Messages): Messages {
-  const result = { ...target }
+function isPlainObject(val: unknown): val is Messages {
+  return !!val && typeof val === 'object' && !Array.isArray(val)
+}
+
+function deepMerge(target: Messages, source?: Messages): Messages {
+  const result: Messages = { ...target }
+  if (!source) return result
   for (const key in source) {
-    if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-      result[key] = deepMerge(result[key] || {}, source[key])
+    const srcVal = source[key]
+    if (isPlainObject(srcVal)) {
+      const tgtVal = isPlainObject(result[key]) ? (result[key] as Messages) : {}
+      result[key] = deepMerge(tgtVal, srcVal)
     } else {
-      result[key] = source[key]
+      result[key] = srcVal
     }
   }
   return result
@@ -58,12 +67,8 @@ export function useListingI18n() {
     const base = defaultMessages[localeCode] ?? defaultMessages.en
 
     // Merge with app.config overrides if provided
-    const overrides = appConfig?.listing?.messages?.[localeCode]
-    if (overrides) {
-      return deepMerge(base, overrides)
-    }
-
-    return base
+    const overrides: Messages = appConfig?.listing?.messages?.[localeCode] ?? {}
+    return deepMerge(base as Messages, overrides)
   }
 
   const t = (key: string, params?: Params) => {

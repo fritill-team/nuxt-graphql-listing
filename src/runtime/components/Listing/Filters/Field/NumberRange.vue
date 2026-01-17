@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { ref, computed, watch } from 'vue'
 import type {RangeFilterFieldConfig} from "../../../../types/listing";
+import { useListingI18n } from '../../../../composables/useListingI18n'
 
 const props = defineProps<{
 	field: RangeFilterFieldConfig<string>

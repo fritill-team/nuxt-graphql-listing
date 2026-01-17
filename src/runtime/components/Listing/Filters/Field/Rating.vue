@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type {BaseFilterFieldConfig} from "../../../../types/listing"
+import { useListingI18n } from '../../../../composables/useListingI18n'
 
 const props = defineProps<{
 	// you can swap this for a dedicated RatingFilterFieldConfig later

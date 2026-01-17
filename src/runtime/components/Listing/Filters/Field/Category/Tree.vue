@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import type {CategoryTreeFilterFieldConfig} from '../../../../../types/listing'
 import CategoryTreeNode from './TreeNode.vue'
+import { useListingI18n } from '../../../../../composables/useListingI18n'
 
 interface FacetCategory {
 	categoryId: string;

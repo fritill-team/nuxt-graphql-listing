@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 type ViewMode = 'grid' | 'list'
 
 const props = defineProps<{

@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { SortDirection, SortOption } from '../../../types/listing'
 import type { SortFieldInput } from '#layers/courses/types/generated'
+import { useListingI18n } from '../../../composables/useListingI18n'
 
 const props = defineProps<{
 	options: SortOption<string>[]
