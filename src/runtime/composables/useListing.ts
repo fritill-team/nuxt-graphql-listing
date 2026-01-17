@@ -1,7 +1,8 @@
-import type { ListingResult, ListingState, SortInput, UseListingOptions, UseListingReturn } from '../types/listing'
-import { deepEqual, normalizeQuery } from '../utils'
-import { buildListingQuery, parseListingQuery } from '../utils/urlState'
-import { computed, type Ref, ref, watch } from 'vue'
+import type {ListingResult, ListingState, SortInput, UseListingOptions, UseListingReturn} from '../types/listing'
+import {deepEqual, normalizeQuery} from '../utils'
+import {buildListingQuery, parseListingQuery} from '../utils/urlState'
+import {computed, type Ref, ref, watch} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
 
 /**
  * Default variable builder following the convention:
@@ -13,7 +14,7 @@ function defaultBuildVariables<Filters, Sort>(
   wrapInput: boolean,
   extraFilters: Partial<Filters>,
 ): any {
-  const mergedFilters = { ...state.filters, ...extraFilters }
+  const mergedFilters = {...state.filters, ...extraFilters}
 
   const variables: Record<string, any> = {
     offset: state.offset,
@@ -22,7 +23,7 @@ function defaultBuildVariables<Filters, Sort>(
     sort: convertSortToKeyed(state.sort),
   }
 
-  return wrapInput ? { input: variables } : variables
+  return wrapInput ? {input: variables} : variables
 }
 
 /**
@@ -149,7 +150,7 @@ export function useListing<
   fetchData()
 
   // Refetch on variable changes
-  watch(variables, () => fetchData(), { deep: true })
+  watch(variables, () => fetchData(), {deep: true})
 
   const items = computed<Item[]>(() => data.value?.items ?? [])
   const total = computed<number>(() => data.value?.total ?? 0)
@@ -168,12 +169,12 @@ export function useListing<
         const current = route.query as Record<string, any>
 
         if (!deepEqual(normalizeQuery(current), normalizeQuery(nextQuery))) {
-          void router.replace({ query: nextQuery, hash: route.hash })
+          void router.replace({query: nextQuery, hash: route.hash})
         }
 
         internalUpdate = false
       },
-      { deep: true },
+      {deep: true},
     )
 
     // URL → State
@@ -201,7 +202,7 @@ export function useListing<
 
   // ---------- API helpers ----------
   function setFilter(patch: Partial<Filters>) {
-    const next: any = { ...(filters.value as any) }
+    const next: any = {...(filters.value as any)}
 
     for (const [k, value] of Object.entries(patch)) {
       next[k] = value === undefined ? null : value
