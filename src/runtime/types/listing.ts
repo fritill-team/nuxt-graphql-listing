@@ -183,7 +183,7 @@ export interface UseListingOptions<
   wrapInput?: boolean
 
   /** Extra filters to merge with state filters (not synced to URL) */
-  extraFilters?: Partial<Filters>
+  extraFilters?: Partial<Filters> | Ref<Partial<Filters>>
 
   /**
    * Custom result mapper (advanced)

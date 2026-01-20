@@ -1,8 +1,8 @@
 <script setup lang="ts" generic="TItem, TFilters, TSort, TFacets">
-import type {SortDirection, FilterFieldConfig,SortOption} from "../../types/listing";
+import type {FilterFieldConfig, SortDirection, SortOption} from "../../types/listing";
 import {computed, ref} from "vue"
 import Topbar from "./Topbar.vue";
-import { useListingI18n } from "../../composables/useListingI18n";
+import {useListingI18n} from "../../composables/useListingI18n";
 
 const props = defineProps<{
   // Filter
@@ -29,6 +29,7 @@ const props = defineProps<{
   sortLabel?: string
 
   hasGridSwitch?: boolean
+  viewMode?: 'grid' | 'list'
 }>()
 
 const emit = defineEmits<{
@@ -37,11 +38,11 @@ const emit = defineEmits<{
   (e: 'update:offset', offset: number): void
 }>()
 
-const { t } = useListingI18n()
+const {t} = useListingI18n()
 
 
-const mobileFiltersOpen = ref(false)
-const viewMode = ref<'grid' | 'list'>('grid')
+
+const viewMode = ref(props.viewMode || 'grid')
 
 
 // Pagination

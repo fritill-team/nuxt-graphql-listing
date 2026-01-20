@@ -1,7 +1,7 @@
 import type {ListingResult, ListingState, SortInput, UseListingOptions, UseListingReturn} from '../types/listing'
 import {deepEqual, normalizeQuery} from '../utils'
 import {buildListingQuery, parseListingQuery} from '../utils/urlState'
-import {computed, type Ref, ref, watch} from 'vue'
+import {computed, type Ref, ref, watch, unref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 
 /**
@@ -119,9 +119,10 @@ export function useListing<
   }))
 
   // ---------- Build variables ----------
-  const variables = computed(() =>
-    defaultBuildVariables(state.value, filterKey, wrapInput, extraFilters),
-  )
+  const variables = computed(() => {
+    const resolvedExtraFilters = unref(extraFilters) ?? ({} as Partial<Filters>)
+    return defaultBuildVariables(state.value, filterKey, wrapInput, resolvedExtraFilters)
+  })
 
   // ---------- Map result ----------
   const mapResult = customMapResult
