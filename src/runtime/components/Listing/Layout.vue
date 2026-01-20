@@ -92,6 +92,7 @@ function onFilterChange(patch: Record<string, any>) {
     <!-- Content -->
     <main class="md:col-span-9 space-y-4">
       <!-- Title / Toolbar -->
+      <slot #header/>
 
       <Topbar
         :sort-config="sortConfig"
