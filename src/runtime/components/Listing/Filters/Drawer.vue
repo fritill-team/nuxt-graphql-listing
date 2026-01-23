@@ -33,6 +33,7 @@ const cloneFilters = (value: TFilters): TFilters => {
 }
 
 const localFilters = ref<TFilters>(cloneFilters(props.filters))
+const { t } = useListingI18n()
 
 watch(
   () => props.open,
@@ -55,7 +56,7 @@ function onFieldChange(patch: Record<string, any>) {
   <USlideover
     :open="props.open"
     @update:open="(value) => { if (!value) close() }"
-    :title="$t('listing.filters')"
+    :title="t('listing.filters')"
   >
     <template #body>
       <Renderer
@@ -68,8 +69,8 @@ function onFieldChange(patch: Record<string, any>) {
 
     <template #footer>
       <div class="flex justify-end gap-2 w-full">
-        <UButton color="neutral" variant="ghost" :label="$t('listing.cancel')" @click="close"/>
-        <UButton :label="$t('listing.apply')" color="primary" @click="submit"/>
+        <UButton color="neutral" variant="ghost" :label="t('listing.cancel')" @click="close"/>
+        <UButton :label="t('listing.apply')" color="primary" @click="submit"/>
       </div>
     </template>
   </USlideover>
