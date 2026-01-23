@@ -1,6 +1,6 @@
-import type { CourseFilterInput, SortDirection } from '~/types/generated'
-import type { FilterFieldConfig, SortOption } from '../../src/runtime/types/listing'
-import type { CourseSort } from '~/types/listing'
+import type {CourseFilterInput, SortDirection} from '~/types/generated'
+import type {FilterFieldConfig, SortOption} from '../../src/runtime/types/listing'
+import type {CourseSort} from '~/types/listing'
 
 
 export const useCourseFilterConfig = (): FilterFieldConfig<keyof CourseFilterInput>[] => {
@@ -22,7 +22,19 @@ export const useCourseFilterConfig = (): FilterFieldConfig<keyof CourseFilterInp
       field: "rating",
       label: "Rating",
     },
-
+    {kind: "separator", key: "category-separator-select", label: ''},
+    {
+      key: 'category',
+      field: 'categoryId',
+      kind: 'select',
+      label: 'Category',
+      options: [
+        {label: 'All Categories', value: null},
+        {label: 'Electronics', value: 'electronics'},
+        {label: 'Clothing', value: 'clothing'},
+        {label: 'Home & Garden', value: 'home-garden'}
+      ]
+    },
     {kind: 'separator', key: 'dates-sep', label: "By Price"},
     {
       key: 'price',

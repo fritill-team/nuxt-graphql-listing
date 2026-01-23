@@ -107,7 +107,7 @@ function onSelect(value: number | null) {
           >
             <template v-for="i in 5" :key="i">
               <Icon
-	              :name="i <= item.value ? 'material-symbols:star-rounded' : 'mdi:star-outline'"
+	              :name="i <= Number(item.value) ? 'material-symbols:star-rounded' : 'mdi:star-outline'"
 	              class="w-5 h-5 text-yellow-500"
 	              size="1.2rem"
               />

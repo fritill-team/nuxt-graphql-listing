@@ -74,7 +74,7 @@ const buttonLabel = computed(() => {
 	<UDropdownMenu :items="selectOptions">
 		<UButton
 			size="lg"
-			color="primary-600"
+			color="primary"
 			class="rounded-full"
 			variant="outline"
 			:aria-label="buttonLabel"

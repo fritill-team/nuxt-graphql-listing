@@ -63,6 +63,13 @@ The main layout wrapper that combines all listing elements: filters, sorting, pa
 | `sortLabel` | `string` | No | Label for sort dropdown |
 | `hasGridSwitch` | `boolean` | No | Show grid/list toggle (default: `true`) |
 | `condensed` | `boolean` | No | When `true`, hides the sidebar filters and shows them in a dropdown from the toolbar instead (default: `false`) |
+| `emptyTitle` | `string` | No | Title for empty state (uses UEmpty) |
+| `emptyDescription` | `string` | No | Description for empty state |
+| `emptyIcon` | `string` | No | Icon for empty state (default: `i-heroicons-exclamation-triangle`) |
+| `emptyAvatar` | `AvatarProps` | No | Avatar props for empty state |
+| `emptyActions` | `ButtonProps[]` | No | Action buttons for empty state |
+| `errorRedirect` | `string` | No | Redirect URL for error state (uses UError) |
+| `errorClear` | `boolean \| ButtonProps` | No | Clear/retry button config for error state |
 
 **Condensed Mode Example:**
 
@@ -102,11 +109,34 @@ In condensed mode:
 | Slot | Props | Description |
 |------|-------|-------------|
 | `content` | `{ items, viewMode }` | Main content area |
+| `header` | - | Content header (above toolbar) |
 | `top-bar-start` | - | Start of toolbar (before sort) |
 | `top-bar-end` | - | End of toolbar (after view switch) |
 | `loading` | - | Custom loading state |
-| `empty` | - | Custom empty state |
-| `error` | `{ error }` | Custom error state |
+| `empty` | - | Custom empty state (replaces UEmpty entirely) |
+| `error` | `{ error }` | Custom error state (replaces UError entirely) |
+
+**UEmpty Forwarded Slots (for customizing default empty state):**
+
+| Slot | Props | Description |
+|------|-------|-------------|
+| `empty-header` | - | UEmpty header slot |
+| `empty-leading` | - | UEmpty leading slot (icon/avatar area) |
+| `empty-title` | - | UEmpty title slot |
+| `empty-description` | - | UEmpty description slot |
+| `empty-body` | - | UEmpty body slot |
+| `empty-actions` | - | UEmpty actions slot |
+| `empty-footer` | - | UEmpty footer slot |
+
+**UError Forwarded Slots (for customizing default error state):**
+
+| Slot | Props | Description |
+|------|-------|-------------|
+| `error-default` | `{ error }` | UError default slot |
+| `error-status-code` | `{ error }` | UError statusCode slot |
+| `error-status-message` | `{ error }` | UError statusMessage slot |
+| `error-message` | `{ error }` | UError message slot |
+| `error-links` | `{ error }` | UError links slot |
 
 ### ListingTopbar
 
@@ -379,37 +409,6 @@ Skeleton loading state.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `count` | `number` | `12` | Number of skeleton items |
-
-### ListingEmpty
-
-Empty state when no results match filters.
-
-```vue
-<ListingEmpty @reset="handleResetFilters" />
-```
-
-| Event | Description |
-|-------|-------------|
-| `reset` | Emitted when user clicks "Reset Filters" |
-
-### ListingErrorState
-
-Error display with retry button.
-
-```vue
-<ListingErrorState
-  :error="error"
-  @retry="handleRetry"
-/>
-```
-
-| Prop | Type | Description |
-|------|------|-------------|
-| `error` | `Error` | Error object to display |
-
-| Event | Description |
-|-------|-------------|
-| `retry` | Emitted when user clicks "Try Again" |
 
 ## Complete Example
 

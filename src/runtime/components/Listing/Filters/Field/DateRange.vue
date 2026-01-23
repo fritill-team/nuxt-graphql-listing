@@ -29,20 +29,20 @@ function update(part: 'gte' | 'lte', raw: string | null) {
 </script>
 
 <template>
-	<UFormGroup :label="field.label" size="sm" class="space-y-1">
+	<UFormField :label="field.label" size="sm" class="space-y-1">
 		<div class="flex gap-2">
 			<UInput
 				type="date"
 				size="sm"
 				:model-value="current.gte ?? ''"
-				@update:model-value="(val) => update('gte', String(val ?? ''))"
+				@update:model-value="(val: string | null) => update('gte', String(val ?? ''))"
 			/>
 			<UInput
 				type="date"
 				size="sm"
 				:model-value="current.lte ?? ''"
-				@update:model-value="(val) => update('lte', String(val ?? ''))"
+				@update:model-value="(val: string | null) => update('lte', String(val ?? ''))"
 			/>
 		</div>
-	</UFormGroup>
+	</UFormField>
 </template>

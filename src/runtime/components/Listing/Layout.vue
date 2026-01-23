@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="TItem, TFilters, TSort, TFacets">
 import type {FilterFieldConfig, SortDirection, SortOption} from "../../types/listing";
-import {computed, ref} from "vue"
+import type {ButtonProps, AvatarProps} from "#ui/types";
+import {computed, ref, useSlots} from "vue"
 import Topbar from "./Topbar.vue";
 import {useListingI18n} from "../../composables/useListingI18n";
 
@@ -31,7 +32,20 @@ const props = defineProps<{
   hasGridSwitch?: boolean
   viewMode?: 'grid' | 'list'
   condensed?: boolean
+
+  // Empty state props (passed to UEmpty)
+  emptyTitle?: string
+  emptyDescription?: string
+  emptyIcon?: string
+  emptyAvatar?: AvatarProps
+  emptyActions?: ButtonProps[]
+
+  // Error state props (passed to UError)
+  errorRedirect?: string
+  errorClear?: boolean | ButtonProps
 }>()
+
+const slots = useSlots()
 
 const emit = defineEmits<{
   (e: 'update:sort', sort: Array<{ field: string; direction: SortDirection }>): void
@@ -123,12 +137,28 @@ function onFilterChange(patch: Record<string, any>) {
         <!-- Error state -->
         <template v-if="error">
           <slot name="error" :error="error">
-            <ListingErrorState
-              :error="error"
-              :title="t('listing.errorTitle')"
-              :retry-text="t('listing.retry')"
-              @retry="$emit('update:offset', 0)"
-            />
+            <UError
+              :error="{ message: error?.message || t('listing.errorTitle') }"
+              :redirect="errorRedirect"
+              :clear="errorClear ?? { label: t('listing.retry'), onClick: () => $emit('update:offset', 0) }"
+            >
+              <!-- Forward UError slots -->
+              <template v-if="slots['error-default']" #default>
+                <slot name="error-default" :error="error" />
+              </template>
+              <template v-if="slots['error-status-code']" #statusCode>
+                <slot name="error-status-code" :error="error" />
+              </template>
+              <template v-if="slots['error-status-message']" #statusMessage>
+                <slot name="error-status-message" :error="error" />
+              </template>
+              <template v-if="slots['error-message']" #message>
+                <slot name="error-message" :error="error" />
+              </template>
+              <template v-if="slots['error-links']" #links>
+                <slot name="error-links" :error="error" />
+              </template>
+            </UError>
           </slot>
         </template>
 
@@ -142,15 +172,47 @@ function onFilterChange(patch: Record<string, any>) {
         <!-- Empty state -->
         <template v-else-if="items.length === 0">
           <slot name="empty">
-            <ListingEmpty
-              :title="t('listing.empty.title')"
-              :description="t('listing.empty.description')"
-              :action-text="t('listing.empty.resetFilters')"
-              @action="() => {
+            <UEmpty
+              :title="emptyTitle ?? t('listing.empty.title')"
+              :description="emptyDescription ?? t('listing.empty.description')"
+              :icon="emptyIcon ?? 'i-heroicons-exclamation-triangle'"
+              :avatar="emptyAvatar"
+              :actions="emptyActions ?? [
+                {
+                  icon: 'i-lucide-refresh-cw',
+                  label: t('listing.empty.resetFilters'),
+                  color: 'neutral',
+                  variant: 'subtle',
+                  onClick: () => {
                     $emit('update:filters', {} as any)
                     $emit('update:offset', 0)
-                  }"
-            />
+                  }
+                }
+              ]"
+            >
+              <!-- Forward UEmpty slots -->
+              <template v-if="slots['empty-header']" #header>
+                <slot name="empty-header" />
+              </template>
+              <template v-if="slots['empty-leading']" #leading>
+                <slot name="empty-leading" />
+              </template>
+              <template v-if="slots['empty-title']" #title>
+                <slot name="empty-title" />
+              </template>
+              <template v-if="slots['empty-description']" #description>
+                <slot name="empty-description" />
+              </template>
+              <template v-if="slots['empty-body']" #body>
+                <slot name="empty-body" />
+              </template>
+              <template v-if="slots['empty-actions']" #actions>
+                <slot name="empty-actions" />
+              </template>
+              <template v-if="slots['empty-footer']" #footer>
+                <slot name="empty-footer" />
+              </template>
+            </UEmpty>
           </slot>
         </template>
 

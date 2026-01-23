@@ -746,7 +746,7 @@ function selectColor(value: string | null) {
 </script>
 
 <template>
-  <UFormGroup :label="field.label">
+  <UFormField :label="field.label">
     <div class="flex flex-wrap gap-2">
       <button
         v-for="color in colors"
@@ -767,7 +767,7 @@ function selectColor(value: string | null) {
         Clear
       </button>
     </div>
-  </UFormGroup>
+  </UFormField>
 </template>
 ```
 
@@ -833,15 +833,15 @@ function updateRadius(value: number | null) {
 
 <template>
   <div class="space-y-3">
-    <UFormGroup label="Location">
+    <UFormField label="Location">
       <UInput
         :model-value="location"
         placeholder="Enter city or zip code"
         @update:model-value="updateLocation"
       />
-    </UFormGroup>
+    </UFormField>
 
-    <UFormGroup label="Radius">
+    <UFormField label="Radius">
       <USelect
         :model-value="radius"
         :options="[
@@ -850,7 +850,7 @@ function updateRadius(value: number | null) {
         ]"
         @update:model-value="updateRadius"
       />
-    </UFormGroup>
+    </UFormField>
   </div>
 </template>
 ```
@@ -888,7 +888,7 @@ import type {
 
 3. **Use the field config**: Access labels and other config via `props.field`.
 
-4. **Consistent styling**: Use Nuxt UI components (`UFormGroup`, `UInput`, etc.) for consistent look and feel.
+4. **Consistent styling**: Use Nuxt UI components (`UFormField`, `UInput`, etc.) for consistent look and feel.
 
 5. **Accessibility**: Include proper labels, ARIA attributes, and keyboard navigation.
 
