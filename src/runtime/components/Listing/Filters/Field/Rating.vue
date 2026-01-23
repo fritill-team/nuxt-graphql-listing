@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type {BaseFilterFieldConfig} from "../../../../types/listing"
+import type {RatingFilterFieldConfig, RatingFacet} from "../../../../types/listing"
 import { useListingI18n } from '../../../../composables/useListingI18n'
 
 const props = defineProps<{
-	// you can swap this for a dedicated RatingFilterFieldConfig later
-	field: BaseFilterFieldConfig<string> & { field: string }
+	field: RatingFilterFieldConfig<string>
 	filters: Record<string, any>
+	/** Rating facet data with counts per rating value */
+	facetOptions?: RatingFacet[] | null
 }>()
 
 const { t } = useListingI18n()
@@ -15,8 +16,18 @@ const emit = defineEmits<{
 	(e: "change", patch: Record<string, any>): void
 }>()
 
-// rating options (4★+, 3★+, 2★+, 1★+)
-const ratingSteps = [4, 3, 2, 1]
+// rating options (4★+, 3★+, 2★+, 1★+) - can be overridden by field.steps
+const ratingSteps = computed(() => props.field.steps ?? [4, 3, 2, 1])
+
+// Map facet data to counts by rating value
+const facetCounts = computed<Record<number, number>>(() => {
+	if (!props.facetOptions?.length) return {}
+	const counts: Record<number, number> = {}
+	for (const f of props.facetOptions) {
+		counts[f.value] = f.count ?? 0
+	}
+	return counts
+})
 
 // current value comes from URL-backed filters object: expect { gte: number }
 const currentValue = computed<number | null>(() => {
@@ -38,14 +49,16 @@ const radioModel = computed<number | null>({
 
 // URadioGroup options: last one is "any" → null
 const radioOptions = computed(() => [
-	...ratingSteps.map((n) => ({
+	...ratingSteps.value.map((n) => ({
 		value: n,
 		// label is overridden by slot, but keep something for a11y
 		label: `${n}★+`,
+		count: facetCounts.value[n],
 	})),
 	{
 		value: null,
 		label: t("listing.rating.any"),
+		count: undefined,
 	},
 ])
 
@@ -101,6 +114,9 @@ function onSelect(value: number | null) {
             </template>
             <span class="ml-1 text-sm text-neutral-600 dark:text-gray-100">
               {{ t('listing.rating.up') }}
+            </span>
+            <span v-if="item.count != null" class="ml-1 text-xs text-neutral-400">
+              ({{ item.count }})
             </span>
           </span>
 				</template>

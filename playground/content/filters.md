@@ -534,6 +534,167 @@ Each filter type has a corresponding Vue component:
 
 The `ListingFiltersRenderer` component automatically selects the correct component based on the `kind` property.
 
+## Facets System
+
+Facets provide dynamic bounds and options for filters based on the current data. The backend sends facets **keyed by field name**, and each filter type expects a specific facet structure.
+
+### Backend Response Structure
+
+The backend should return facets as an object where each key matches a filter field name:
+
+```ts
+{
+  items: [...],
+  total: 100,
+  facets: {
+    // For range filters (int-range, decimal-range)
+    price: { min: 0, max: 1000 },
+    quantity: { min: 1, max: 500 },
+
+    // For datetime-range filters
+    createdAt: { min: '2024-01-01', max: '2024-12-31' },
+
+    // For select and switch-multi filters
+    categoryId: [
+      { value: 'electronics', label: 'Electronics', count: 150 },
+      { value: 'clothing', label: 'Clothing', count: 200 }
+    ],
+
+    // For rating filters
+    rating: [
+      { value: 5, count: 50 },
+      { value: 4, count: 120 },
+      { value: 3, count: 80 }
+    ],
+
+    // For category-tree filters
+    category: [
+      {
+        id: '1',
+        name: 'Electronics',
+        count: 150,
+        children: [
+          { id: '1-1', name: 'Phones', count: 80 },
+          { id: '1-2', name: 'Laptops', count: 70 }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Facet Types by Filter Kind
+
+| Filter Kind | Facet Type | Structure |
+|-------------|------------|-----------|
+| `int-range`, `decimal-range` | `RangeFacet` | `{ min: number, max: number }` |
+| `datetime-range`, `datetime-range-group` | `DateRangeFacet` | `{ min: string, max: string }` (ISO dates) |
+| `select`, `boolean-select`, `switch-multi` | `OptionFacet[]` | `[{ value, label?, count? }]` |
+| `rating` | `RatingFacet[]` | `[{ value: number, count? }]` |
+| `category-tree` | `CategoryFacet[]` | `[{ id, name, count?, children? }]` |
+| `custom` | `unknown` | Raw data passed to component as `facet` prop |
+
+### TypeScript Types
+
+```ts
+import type {
+  RangeFacet,
+  DateRangeFacet,
+  OptionFacet,
+  RatingFacet,
+  CategoryFacet,
+  FieldKeyedFacets
+} from '@fritill-team/nuxt-graphql-listing'
+
+// Range facet for numeric filters
+interface RangeFacet {
+  min: number | null
+  max: number | null
+}
+
+// Date range facet
+interface DateRangeFacet {
+  min: string | null  // ISO date string
+  max: string | null
+}
+
+// Option facet for select/multi filters
+interface OptionFacet {
+  value: string | number | boolean
+  label?: string
+  count?: number
+}
+
+// Rating facet
+interface RatingFacet {
+  value: number
+  count?: number
+}
+
+// Category tree facet
+interface CategoryFacet {
+  id: string
+  name: string
+  count?: number
+  children?: CategoryFacet[]
+  pathText?: string      // For flat lists needing path reconstruction
+  treeId?: string        // For multi-tree support
+  translations?: Array<{ language: string; name: string; slug?: string }>
+}
+```
+
+### How Facets Are Applied
+
+1. **Range filters** (`int-range`, `decimal-range`): Facets set the min/max bounds for the slider and inputs
+2. **Select filters**: Facets can provide dynamic options with counts (overrides static `options` if provided)
+3. **Switch-multi filters**: Facets add counts to each option
+4. **Rating filters**: Facets show the count of items for each rating level
+5. **Category tree filters**: Facets provide the entire category hierarchy with counts
+
+### Example: GraphQL Query with Facets
+
+```graphql
+query Products($input: ProductsInput!) {
+  products(input: $input) {
+    items {
+      id
+      name
+      price
+    }
+    total
+    facets {
+      price {
+        min
+        max
+      }
+      categoryId {
+        value
+        label
+        count
+      }
+      rating {
+        value
+        count
+      }
+    }
+  }
+}
+```
+
+### Custom Filter Facets
+
+For custom filters, the raw facet data is passed as the `facet` prop. Your component handles the facet structure:
+
+```vue
+<script setup>
+const props = defineProps<{
+  field: CustomFilterFieldConfig
+  filters: Record<string, any>
+  facet?: MyCustomFacetType  // Your custom facet structure
+}>()
+</script>
+```
+
 ## Custom Filters Guide
 
 The `custom` filter kind allows you to create your own filter components that integrate seamlessly with the listing system. This is useful when you need specialized UI or logic not covered by the built-in filter types.
@@ -548,6 +709,7 @@ Your custom filter component receives specific props and must emit a `change` ev
 |------|------|-------------|
 | `field` | `CustomFilterFieldConfig` | The filter configuration object |
 | `filters` | `object` | Current filter state |
+| `facet` | `unknown` | (Optional) Raw facet data for this field from the backend |
 
 **Required Events:**
 

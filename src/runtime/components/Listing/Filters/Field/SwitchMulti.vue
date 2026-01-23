@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { SwitchMultiFilterFieldConfig } from '../../../../types/listing'
+import type { SwitchMultiFilterFieldConfig, OptionFacet } from '../../../../types/listing'
 import { useListingI18n } from '../../../../composables/useListingI18n'
 
 const props = defineProps<{
 	field: SwitchMultiFilterFieldConfig<string>
 	filters: Record<string, any>
+	/** Dynamic options from facets (adds counts to options) */
+	facetOptions?: OptionFacet[] | null
 }>()
 
 const emit = defineEmits<{
@@ -20,6 +22,24 @@ const selectedValues = computed<(string | number | boolean)[]>(() => {
 	if (!raw) return []
 	if (Array.isArray(raw)) return raw as (string | number | boolean)[]
 	return [raw as string | number | boolean]
+})
+
+// Map facet data to counts by value
+const facetCounts = computed<Record<string | number, number>>(() => {
+	if (!props.facetOptions?.length) return {}
+	const counts: Record<string | number, number> = {}
+	for (const f of props.facetOptions) {
+		counts[String(f.value)] = f.count ?? 0
+	}
+	return counts
+})
+
+// Options with counts from facets
+const optionsWithCounts = computed(() => {
+	return props.field.options.map(opt => ({
+		...opt,
+		count: facetCounts.value[String(opt.value)],
+	}))
 })
 
 function onToggle(optionValue: string | number | boolean, checked: boolean) {
@@ -71,7 +91,7 @@ function clearAll() {
 
 		<div class="space-y-2">
 			<label
-				v-for="opt in field.options"
+				v-for="opt in optionsWithCounts"
 				:key="String(opt.value)"
 				class="flex items-center gap-2"
 			>
@@ -82,6 +102,9 @@ function clearAll() {
 				<span class="truncate">
           {{ opt.label }}
         </span>
+				<span v-if="opt.count != null" class="text-xs text-neutral-400">
+					({{ opt.count }})
+				</span>
 			</label>
 		</div>
 	</div>

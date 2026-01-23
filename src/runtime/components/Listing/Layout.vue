@@ -94,7 +94,7 @@ function onFilterChange(patch: Record<string, any>) {
     />
 
     <!-- Content -->
-    <main :class="['space-y-4', showSidebar ? 'md:col-span-9' : 'md:col-span-12']">
+    <div :class="['space-y-4', showSidebar ? 'md:col-span-9' : 'md:col-span-12']">
       <!-- Title / Toolbar -->
       <slot name="header"/>
 
@@ -119,7 +119,7 @@ function onFilterChange(patch: Record<string, any>) {
       </Topbar>
 
       <!-- Content placeholder -->
-      <div class="min-h-full my-6">
+      <div class="my-6">
         <!-- Error state -->
         <template v-if="error">
           <slot name="error" :error="error">
@@ -182,6 +182,6 @@ function onFilterChange(patch: Record<string, any>) {
         </div>
       </div>
 
-    </main>
+    </div>
   </div>
 </template>

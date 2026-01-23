@@ -54,33 +54,63 @@ function getCustomProps(field: FilterFieldConfig<string>): Record<string, any> {
   return {}
 }
 
+/**
+ * Get facet props for a filter field.
+ * Facets are keyed by field name in the API response.
+ *
+ * Expected backend response structure:
+ * {
+ *   facets: {
+ *     price: { min: 0, max: 1000 },           // for int-range, decimal-range
+ *     categoryId: [{ id, name, count, children }],  // for category-tree
+ *     rating: [{ value: 5, count: 10 }],      // for rating
+ *     tags: [{ value: 'new', count: 5 }],     // for select, switch-multi
+ *   }
+ * }
+ */
 function getFacetProps(field: FilterFieldConfig<string>): Record<string, any> {
   if (!props.facets) return {}
 
+  const fieldName = 'field' in field ? field.field : null
+  if (!fieldName) return {}
+
+  const facetData = (props.facets as Record<string, any>)[fieldName]
+  if (facetData === undefined || facetData === null) return {}
+
+  // Range filters expect { min, max }
   if (field.kind === 'decimal-range' || field.kind === 'int-range') {
-    const fieldName = 'field' in field ? field.field : ''
-
-    if (fieldName === 'price') {
-      return {
-        facetMin: props.facets.priceMinCents != null
-          ? props.facets.priceMinCents / 100
-          : null,
-        facetMax: props.facets.priceMaxCents != null
-          ? props.facets.priceMaxCents / 100
-          : null,
-      }
-    }
-
     return {
-      facetMin: props.facets[`${fieldName}Min`] ?? props.facets[`${fieldName}MinCents`] ?? null,
-      facetMax: props.facets[`${fieldName}Max`] ?? props.facets[`${fieldName}MaxCents`] ?? null,
+      facetMin: facetData.min ?? null,
+      facetMax: facetData.max ?? null,
     }
   }
 
-  if (field.kind === 'category-tree') {
-    if ((props.facets as any)?.categories) {
-      return {facetOptions: (props.facets as any).categories}
+  // Datetime range filters expect { min, max } as ISO strings
+  if (field.kind === 'datetime-range') {
+    return {
+      facetMin: facetData.min ?? null,
+      facetMax: facetData.max ?? null,
     }
+  }
+
+  // Category tree expects array of CategoryFacet
+  if (field.kind === 'category-tree') {
+    return { facetOptions: Array.isArray(facetData) ? facetData : null }
+  }
+
+  // Rating expects array of RatingFacet
+  if (field.kind === 'rating') {
+    return { facetOptions: Array.isArray(facetData) ? facetData : null }
+  }
+
+  // Select and switch-multi expect array of OptionFacet
+  if (field.kind === 'select' || field.kind === 'boolean-select' || field.kind === 'switch-multi') {
+    return { facetOptions: Array.isArray(facetData) ? facetData : null }
+  }
+
+  // Custom filters receive raw facet data - developer handles it
+  if (field.kind === 'custom') {
+    return { facet: facetData }
   }
 
   return {}
@@ -92,11 +122,11 @@ function onFieldChange(patch: Record<string, any>) {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-4">
     <template v-for="field in config" :key="field.key">
       <div
         v-if="field.kind === 'separator'"
-        class="flex items-center gap-2 py-3"
+        class="flex items-center gap-2 "
         role="separator"
       >
         <span

@@ -20,6 +20,88 @@ export interface SortOption<F extends string = string> {
 }
 
 // ============================================
+// Facet Types (keyed by field name in API response)
+// ============================================
+
+/**
+ * Facet for range filters (int-range, decimal-range, datetime-range)
+ * Backend should return: { [fieldName]: { min: number, max: number } }
+ */
+export interface RangeFacet {
+  min: number | null
+  max: number | null
+}
+
+/**
+ * Facet for datetime range filters
+ * Backend should return: { [fieldName]: { min: string, max: string } } (ISO dates)
+ */
+export interface DateRangeFacet {
+  min: string | null
+  max: string | null
+}
+
+/**
+ * Facet option for select/switch-multi filters
+ * Backend should return: { [fieldName]: OptionFacet[] }
+ */
+export interface OptionFacet {
+  value: string | number | boolean
+  label?: string
+  count?: number
+}
+
+/**
+ * Facet for category tree filters
+ * Backend should return: { [fieldName]: CategoryFacet[] }
+ */
+export interface CategoryFacet {
+  id: string
+  name: string
+  count?: number
+  children?: CategoryFacet[]
+  /** For flat lists that need path reconstruction */
+  pathText?: string
+  /** For multi-tree support */
+  treeId?: string
+  /** Translations for i18n support */
+  translations?: Array<{
+    language: string
+    name: string
+    slug?: string
+  }>
+}
+
+/**
+ * Facet for rating filters
+ * Backend should return: { [fieldName]: RatingFacet[] }
+ */
+export interface RatingFacet {
+  value: number
+  count?: number
+}
+
+/**
+ * Type helper to get the expected facet type for a filter kind
+ */
+export type FacetTypeForKind<K extends FilterControlKind> =
+  K extends 'int-range' | 'decimal-range' ? RangeFacet :
+  K extends 'datetime-range' | 'datetime-range-group' ? DateRangeFacet :
+  K extends 'select' | 'boolean-select' | 'switch-multi' ? OptionFacet[] :
+  K extends 'category-tree' ? CategoryFacet[] :
+  K extends 'rating' ? RatingFacet[] :
+  K extends 'custom' ? unknown :
+  never
+
+/**
+ * Field-keyed facets object
+ * Each key is the field name, value is the facet data for that field's filter type
+ */
+export type FieldKeyedFacets<Fields extends string = string> = {
+  [K in Fields]?: RangeFacet | DateRangeFacet | OptionFacet[] | CategoryFacet[] | RatingFacet[] | unknown
+}
+
+// ============================================
 // Filter Types
 // ============================================
 
