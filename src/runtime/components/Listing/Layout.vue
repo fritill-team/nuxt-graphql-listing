@@ -30,6 +30,7 @@ const props = defineProps<{
 
   hasGridSwitch?: boolean
   viewMode?: 'grid' | 'list'
+  condensed?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -43,6 +44,8 @@ const {t} = useListingI18n()
 
 
 const viewMode = ref(props.viewMode || 'grid')
+
+const showSidebar = computed(() => !props.condensed && props.filtersConfig.length > 0)
 
 
 // Pagination
@@ -83,6 +86,7 @@ function onFilterChange(patch: Record<string, any>) {
   <div class="grid grid-cols-1 gap-4 md:grid-cols-12 w-full">
     <!-- Desktop Filters (md+) -->
     <LazyListingFiltersAsidePanel
+      v-if="showSidebar"
       :filters="filters as any"
       :config="filtersConfig"
       :facets="facets as any"
@@ -90,7 +94,7 @@ function onFilterChange(patch: Record<string, any>) {
     />
 
     <!-- Content -->
-    <main class="md:col-span-9 space-y-4">
+    <main :class="['space-y-4', showSidebar ? 'md:col-span-9' : 'md:col-span-12']">
       <!-- Title / Toolbar -->
       <slot name="header"/>
 
@@ -99,6 +103,7 @@ function onFilterChange(patch: Record<string, any>) {
         :sort="sort"
         :sort-label="sortLabel"
         :has-grid-switch="hasGridSwitch"
+        :condensed="condensed"
         v-model:view-mode="viewMode"
         :filters="filters as any"
         :filters-config="filtersConfig"

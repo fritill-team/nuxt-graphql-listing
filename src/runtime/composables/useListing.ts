@@ -5,6 +5,34 @@ import {computed, type Ref, ref, watch, unref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 
 /**
+ * Check if a value is empty (null, undefined, empty string, empty array, or empty object)
+ */
+function isEmpty(value: any): boolean {
+  if (value === null || value === undefined) return true
+  if (typeof value === 'string' && value.trim() === '') return true
+  if (Array.isArray(value) && value.length === 0) return true
+  if (typeof value === 'object' && Object.keys(value).length === 0) return true
+  return false
+}
+
+/**
+ * Remove empty values from filters object
+ */
+function cleanFilters<Filters>(filters: Filters): Partial<Filters> | null {
+  const cleaned: Record<string, any> = {}
+  let hasValues = false
+
+  for (const [key, value] of Object.entries(filters as Record<string, any>)) {
+    if (!isEmpty(value)) {
+      cleaned[key] = value
+      hasValues = true
+    }
+  }
+
+  return hasValues ? cleaned as Partial<Filters> : null
+}
+
+/**
  * Default variable builder following the convention:
  * { input: { offset, limit, filters, sort: { fieldName: 'ASC' } } }
  */
@@ -15,12 +43,20 @@ function defaultBuildVariables<Filters, Sort>(
   extraFilters: Partial<Filters>,
 ): any {
   const mergedFilters = {...state.filters, ...extraFilters}
+  const cleanedFilters = cleanFilters(mergedFilters)
+  const sortKeyed = convertSortToKeyed(state.sort)
 
   const variables: Record<string, any> = {
     offset: state.offset,
     limit: state.limit,
-    [filterKey]: mergedFilters,
-    sort: convertSortToKeyed(state.sort),
+  }
+
+  if (cleanedFilters) {
+    variables[filterKey] = cleanedFilters
+  }
+
+  if (Object.keys(sortKeyed).length > 0) {
+    variables.sort = sortKeyed
   }
 
   return wrapInput ? {input: variables} : variables

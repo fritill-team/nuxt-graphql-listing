@@ -196,6 +196,30 @@ const listing = useListing({
 })
 ```
 
+## Request Optimization
+
+The composable automatically optimizes GraphQL requests by omitting empty values:
+
+- **Empty filters**: If all filter values are `null`, `undefined`, empty strings, or empty arrays/objects, the `filters` key is omitted from the request
+- **Empty sort**: If no sort is specified (empty array), the `sort` key is omitted from the request
+
+This keeps your GraphQL requests clean and avoids sending unnecessary data:
+
+```ts
+// When filters and sort are empty
+variables = { input: { offset: 0, limit: 20 } }
+
+// When filters have values
+variables = {
+  input: {
+    offset: 0,
+    limit: 20,
+    filters: { category: 'electronics' },
+    sort: { price: 'ASC' }
+  }
+}
+```
+
 ## Sort Modes
 
 The module supports two sort serialization formats:

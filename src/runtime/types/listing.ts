@@ -1,5 +1,6 @@
 import type { ApolloClient } from '@apollo/client/core'
 import type { DocumentNode } from 'graphql/index'
+import type { Component, Ref } from 'vue'
 
 // ============================================
 // Sort Types
@@ -34,6 +35,7 @@ export type FilterControlKind =
   | 'rating'
   | 'category-tree'
   | 'separator'
+  | 'custom'
 
 export interface BaseFilterFieldConfig<F extends string = string> {
   key: string
@@ -101,6 +103,14 @@ export interface CategoryTreeFilterFieldConfig<F extends string = string>
   field: F
 }
 
+export interface CustomFilterFieldConfig<F extends string = string>
+  extends BaseFilterFieldConfig<F> {
+  kind: 'custom'
+  field: F
+  component: Component
+  props?: Record<string, any>
+}
+
 export type FilterFieldConfig<F extends string = string> =
   | SelectFilterFieldConfig<F>
   | RangeFilterFieldConfig<F>
@@ -109,6 +119,7 @@ export type FilterFieldConfig<F extends string = string> =
   | SwitchMultiFilterFieldConfig<F>
   | RatingFilterFieldConfig<F>
   | CategoryTreeFilterFieldConfig<F>
+  | CustomFilterFieldConfig<F>
   | SeparatorFieldConfig
 
 // ============================================

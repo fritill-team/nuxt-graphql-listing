@@ -13,7 +13,8 @@
     ".": {
       "types": "./dist/types.d.mts",
       "import": "./dist/module.mjs"
-    }
+    },
+    "./style.css": "./dist/runtime/css/index.css"
   },
   "main": "./dist/module.mjs",
   "types": "./dist/types.d.mts",

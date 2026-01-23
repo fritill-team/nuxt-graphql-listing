@@ -1,12 +1,12 @@
 ---
 title: Filters
-description: Complete documentation for the filter system including all 12 filter control types and configuration options.
+description: Complete documentation for the filter system including all 13 filter control types (including custom filters) and configuration options.
 order: 4
 ---
 
 # Filter System
 
-The module provides a powerful filter system with 12 different control types. This page documents how to configure and use each filter type.
+The module provides a powerful filter system with 13 different control types, including support for custom filter components. This page documents how to configure and use each filter type.
 
 ## Filter Configuration
 
@@ -368,6 +368,33 @@ Visual divider between filter sections (no filtering functionality).
 }
 ```
 
+### 12. Custom (`custom`)
+
+Inject your own custom filter component. This allows consuming apps to create specialized filters that aren't covered by the built-in types.
+
+```ts
+import MyCustomFilter from '~/components/filters/MyCustomFilter.vue'
+
+{
+  key: 'myFilter',
+  field: 'customField',
+  kind: 'custom',
+  label: 'My Custom Filter',
+  component: MyCustomFilter,
+  props: {
+    myCustomProp: 'some value',
+    anotherProp: 123
+  }
+}
+```
+
+**Filter State:**
+```ts
+{ customField: 'user-selected-value' }
+```
+
+See the [Custom Filters Guide](#custom-filters-guide) section below for detailed instructions on creating custom filter components.
+
 ## Complete Filter Configuration Example
 
 ```ts
@@ -503,8 +530,205 @@ Each filter type has a corresponding Vue component:
 | `switch-multi` | `ListingFiltersFieldSwitchMulti` |
 | `rating` | `ListingFiltersFieldRating` |
 | `category-tree` | `ListingFiltersFieldCategoryTree` |
+| `custom` | Your custom component (specified in config) |
 
 The `ListingFiltersRenderer` component automatically selects the correct component based on the `kind` property.
+
+## Custom Filters Guide
+
+The `custom` filter kind allows you to create your own filter components that integrate seamlessly with the listing system. This is useful when you need specialized UI or logic not covered by the built-in filter types.
+
+### Creating a Custom Filter Component
+
+Your custom filter component receives specific props and must emit a `change` event with filter updates.
+
+**Required Props:**
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `field` | `CustomFilterFieldConfig` | The filter configuration object |
+| `filters` | `object` | Current filter state |
+
+**Required Events:**
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `change` | `Record<string, any>` | Emit filter changes as `{ fieldName: newValue }` |
+
+**Additional Props:**
+
+Any props defined in the `props` property of your filter config will be passed to your component.
+
+### Example: Color Picker Filter
+
+```vue
+<!-- components/filters/ColorPickerFilter.vue -->
+<script setup lang="ts">
+import type { CustomFilterFieldConfig } from '@fritill-team/nuxt-graphql-listing'
+
+const props = defineProps<{
+  field: CustomFilterFieldConfig<string>
+  filters: Record<string, any>
+  colors?: Array<{ name: string; value: string; hex: string }>
+}>()
+
+const emit = defineEmits<{
+  (e: 'change', patch: Record<string, any>): void
+}>()
+
+const selectedColor = computed(() => props.filters[props.field.field] ?? null)
+
+function selectColor(value: string | null) {
+  emit('change', { [props.field.field]: value })
+}
+</script>
+
+<template>
+  <UFormGroup :label="field.label">
+    <div class="flex flex-wrap gap-2">
+      <button
+        v-for="color in colors"
+        :key="color.value"
+        type="button"
+        class="w-8 h-8 rounded-full border-2 transition-all"
+        :class="selectedColor === color.value ? 'border-primary ring-2 ring-primary/50' : 'border-gray-200'"
+        :style="{ backgroundColor: color.hex }"
+        :title="color.name"
+        @click="selectColor(color.value)"
+      />
+      <button
+        v-if="selectedColor"
+        type="button"
+        class="text-sm text-gray-500 hover:text-gray-700"
+        @click="selectColor(null)"
+      >
+        Clear
+      </button>
+    </div>
+  </UFormGroup>
+</template>
+```
+
+### Using the Custom Filter
+
+```ts
+// composables/useProductFilterConfig.ts
+import ColorPickerFilter from '~/components/filters/ColorPickerFilter.vue'
+
+export function useProductFilterConfig(): FilterFieldConfig[] {
+  return [
+    // ... other filters
+    {
+      key: 'color',
+      field: 'colorId',
+      kind: 'custom',
+      label: 'Color',
+      component: ColorPickerFilter,
+      props: {
+        colors: [
+          { name: 'Red', value: 'red', hex: '#ef4444' },
+          { name: 'Blue', value: 'blue', hex: '#3b82f6' },
+          { name: 'Green', value: 'green', hex: '#22c55e' },
+          { name: 'Yellow', value: 'yellow', hex: '#eab308' },
+          { name: 'Purple', value: 'purple', hex: '#a855f7' }
+        ]
+      }
+    }
+  ]
+}
+```
+
+### Example: Location Radius Filter
+
+A more complex example with multiple fields:
+
+```vue
+<!-- components/filters/LocationRadiusFilter.vue -->
+<script setup lang="ts">
+const props = defineProps<{
+  field: any
+  filters: Record<string, any>
+  radiusOptions?: number[]
+}>()
+
+const emit = defineEmits<{
+  (e: 'change', patch: Record<string, any>): void
+}>()
+
+const radiusOptions = props.radiusOptions ?? [5, 10, 25, 50, 100]
+
+const location = computed(() => props.filters.location ?? '')
+const radius = computed(() => props.filters.radius ?? null)
+
+function updateLocation(value: string) {
+  emit('change', { location: value || null })
+}
+
+function updateRadius(value: number | null) {
+  emit('change', { radius: value })
+}
+</script>
+
+<template>
+  <div class="space-y-3">
+    <UFormGroup label="Location">
+      <UInput
+        :model-value="location"
+        placeholder="Enter city or zip code"
+        @update:model-value="updateLocation"
+      />
+    </UFormGroup>
+
+    <UFormGroup label="Radius">
+      <USelect
+        :model-value="radius"
+        :options="[
+          { label: 'Any distance', value: null },
+          ...radiusOptions.map(r => ({ label: `${r} miles`, value: r }))
+        ]"
+        @update:model-value="updateRadius"
+      />
+    </UFormGroup>
+  </div>
+</template>
+```
+
+```ts
+// In filter config
+{
+  key: 'locationRadius',
+  field: 'location',  // Primary field
+  kind: 'custom',
+  label: 'Location',
+  component: LocationRadiusFilter,
+  props: {
+    radiusOptions: [5, 10, 25, 50]
+  }
+}
+```
+
+### TypeScript Support
+
+For full TypeScript support, import the types:
+
+```ts
+import type {
+  FilterFieldConfig,
+  CustomFilterFieldConfig
+} from '@fritill-team/nuxt-graphql-listing'
+```
+
+### Best Practices
+
+1. **Emit changes immediately**: Don't batch updates; emit each change as it happens for real-time filter updates.
+
+2. **Handle null values**: Always support `null` for clearing the filter.
+
+3. **Use the field config**: Access labels and other config via `props.field`.
+
+4. **Consistent styling**: Use Nuxt UI components (`UFormGroup`, `UInput`, etc.) for consistent look and feel.
+
+5. **Accessibility**: Include proper labels, ARIA attributes, and keyboard navigation.
 
 ## Next Steps
 

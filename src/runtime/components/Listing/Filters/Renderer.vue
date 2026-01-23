@@ -20,8 +20,12 @@ const emit = defineEmits<{
   (e: "change", patch: Record<string, any>): void
 }>()
 
-function resolveComponent(kind: FilterFieldConfig<string>["kind"]) {
-  switch (kind) {
+function resolveComponent(field: FilterFieldConfig<string>) {
+  if (field.kind === 'custom' && 'component' in field) {
+    return field.component
+  }
+
+  switch (field.kind) {
     case "select":
     case "boolean-select":
       return Select
@@ -41,6 +45,13 @@ function resolveComponent(kind: FilterFieldConfig<string>["kind"]) {
     case 'category-tree':
       return CategoryTree
   }
+}
+
+function getCustomProps(field: FilterFieldConfig<string>): Record<string, any> {
+  if (field.kind === 'custom' && 'props' in field) {
+    return field.props ?? {}
+  }
+  return {}
 }
 
 function getFacetProps(field: FilterFieldConfig<string>): Record<string, any> {
@@ -98,11 +109,11 @@ function onFieldChange(patch: Record<string, any>) {
       </div>
 
       <component
-        :is="resolveComponent(field.kind)"
+        :is="resolveComponent(field)"
         v-else
         :field="field as any"
         :filters="filters"
-        v-bind="getFacetProps(field)"
+        v-bind="{ ...getFacetProps(field), ...getCustomProps(field) }"
         @change="onFieldChange"
       />
     </template>

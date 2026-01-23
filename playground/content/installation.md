@@ -73,6 +73,21 @@ export default defineNuxtConfig({
 | `components` | `boolean` | `true` | Auto-register all listing components globally |
 | `autoImports` | `boolean` | `true` | Auto-import composables (`useListing`, `useListingI18n`) |
 
+## CSS / Tailwind Setup
+
+The module's components use Tailwind CSS utility classes. To ensure all styles are included in your build, import the module's CSS file in your main stylesheet:
+
+```css
+/* assets/css/main.css */
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/* Import the listing module's component styles */
+@import "@fritill-team/nuxt-graphql-listing/style.css";
+```
+
+This `@source` directive tells Tailwind to scan the module's component files for utility classes, ensuring they're included in your CSS bundle.
+
 ## Apollo Client Setup
 
 The module requires an Apollo Client instance. You can set this up in a Nuxt plugin:

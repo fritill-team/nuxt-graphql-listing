@@ -20,9 +20,11 @@ const props = withDefaults(defineProps<{
   filters: TFilters
   filtersConfig: FilterFieldConfig<string>[]
   facets?: TFacets | null
+  condensed?: boolean
 }>(), {
   viewMode: "grid",
   sort: null,
+  condensed: false,
 })
 
 const emit = defineEmits<{
@@ -68,11 +70,12 @@ const onSort = (newSort: Array<SortInput>): void => emit('update:sort', newSort)
                       v-model="viewMode"
                       :label="t('listing.toggleViewMode')"/>
       <UButton
+        v-if="filtersConfig.length > 0"
         icon="i-lucide-filter"
         size="lg"
         color="primary"
         variant="outline"
-        class="visible lg:hidden rounded-full"
+        :class="['rounded-full', condensed ? '' : 'lg:hidden']"
         @click="openDrawer"
       />
       <Sort

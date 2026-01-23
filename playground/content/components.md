@@ -62,6 +62,31 @@ The main layout wrapper that combines all listing elements: filters, sorting, pa
 | `filtersTitle` | `string` | No | Title for filters panel |
 | `sortLabel` | `string` | No | Label for sort dropdown |
 | `hasGridSwitch` | `boolean` | No | Show grid/list toggle (default: `true`) |
+| `condensed` | `boolean` | No | When `true`, hides the sidebar filters and shows them in a dropdown from the toolbar instead (default: `false`) |
+
+**Condensed Mode Example:**
+
+When you want a more compact layout without the sidebar, use condensed mode:
+
+```vue
+<template>
+  <ListingLayout
+    :condensed="true"
+    :items="items"
+    :filters="filters"
+    :filters-config="filterConfig"
+    ...
+  >
+    <!-- Content spans full width, filters accessible via toolbar button -->
+  </ListingLayout>
+</template>
+```
+
+In condensed mode:
+- The filters sidebar is hidden
+- Content area spans full width (12 columns instead of 9)
+- A filter button appears in the toolbar that opens a drawer with filters
+- Useful for pages where screen real estate is limited or filters are secondary
 
 **Events:**
 

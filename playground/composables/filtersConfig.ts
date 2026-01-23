@@ -3,11 +3,7 @@ import type { FilterFieldConfig, SortOption } from '../../src/runtime/types/list
 import type { CourseSort } from '~/types/listing'
 
 
-export type CourseFilterField = keyof CourseFilterInput
-
-
 export const useCourseFilterConfig = (): FilterFieldConfig<keyof CourseFilterInput>[] => {
-
   return [
     {
       key: 'meta-switches',
