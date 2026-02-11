@@ -1,26 +1,17 @@
-<script setup lang="ts">
-import { computed } from 'vue'
-
-type ViewMode = 'grid' | 'list'
-
-const props = defineProps<{
-	modelValue: ViewMode
-	label?: string
-}>()
-
-const emit = defineEmits<{
-	'update:modelValue': [value: ViewMode]
-}>()
-
-const isGrid = computed(() => props.modelValue === 'grid')
-
+<script setup>
+import { computed } from "vue";
+const props = defineProps({
+  modelValue: { type: String, required: true },
+  label: { type: String, required: false }
+});
+const emit = defineEmits(["update:modelValue"]);
+const isGrid = computed(() => props.modelValue === "grid");
 const setGrid = () => {
-	if (!isGrid.value) emit('update:modelValue', 'grid')
-}
-
+  if (!isGrid.value) emit("update:modelValue", "grid");
+};
 const setList = () => {
-	if (isGrid.value) emit('update:modelValue', 'list')
-}
+  if (isGrid.value) emit("update:modelValue", "list");
+};
 </script>
 
 <template>
@@ -30,7 +21,7 @@ const setList = () => {
 		:aria-label="label || 'Toggle view mode'"
 	>
     <span class="sr-only">
-      {{ label || 'Toggle view mode' }}
+      {{ label || "Toggle view mode" }}
     </span>
 
 		<!-- Track: bordered, no background -->
@@ -75,73 +66,5 @@ const setList = () => {
 </template>
 
 <style scoped>
-/* ========== MOBILE (default) ========== */
-/* Smaller track */
-.view-switch-track {
-	width: 3.5rem;   /* ~56px */
-	height: 2rem;    /* ~32px */
-}
-
-/* Pill:
-   track 32px high, pill 24px → (32-24)/2 = 4px padding top+bottom
-*/
-.view-switch-pill {
-	position: absolute;
-	width: 1.5rem;   /* ~24px */
-	height: 1.5rem;
-	top: 50%;
-	transform: translate(-50%, -50%);
-	transition: left 0.2s ease;
-}
-
-/* Left/right: centers at 25% and 75% */
-.view-switch-pill--left {
-	left: 25%;
-}
-
-.view-switch-pill--right {
-	left: 75%;
-}
-
-/* Icons share same centers as pill */
-.view-switch-icon {
-	position: absolute;
-	width: 1.5rem;
-	height: 1.5rem;
-	top: 50%;
-	transform: translate(-50%, -50%);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background: transparent;
-	border: none;
-	padding: 0;
-}
-
-.view-switch-icon--left {
-	left: 25%;
-}
-
-.view-switch-icon--right {
-	left: 75%;
-}
-
-/* ========== DESKTOP (md and up) ========== */
-@media (min-width: 768px) {
-	.view-switch-track {
-		width: 4.5rem;    /* ~72px */
-		height: 2.25rem;  /* ~36px */
-	}
-
-	/* track 36px high, pill 28px → 4px padding */
-	.view-switch-pill {
-		width: 1.75rem;   /* ~28px */
-		height: 1.75rem;
-	}
-
-	.view-switch-icon {
-		width: 1.75rem;
-		height: 1.75rem;
-	}
-}
+.view-switch-track{height:2rem;width:3.5rem}.view-switch-pill{height:1.5rem;position:absolute;top:50%;transform:translate(-50%,-50%);transition:left .2s ease;width:1.5rem}.view-switch-pill--left{left:25%}.view-switch-pill--right{left:75%}.view-switch-icon{align-items:center;background:transparent;border:none;display:flex;height:1.5rem;justify-content:center;padding:0;position:absolute;top:50%;transform:translate(-50%,-50%);width:1.5rem}.view-switch-icon--left{left:25%}.view-switch-icon--right{left:75%}@media (min-width:768px){.view-switch-track{height:2.25rem;width:4.5rem}.view-switch-icon,.view-switch-pill{height:1.75rem;width:1.75rem}}
 </style>

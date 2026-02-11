@@ -25,14 +25,14 @@
     "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
-    "dev": "nuxi dev playground",
-    "dev:prepare": "nuxt prepare playground",
+    "dev": "yarn dev:prepare && nuxi dev playground",
+    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
     "build": "nuxt build playground",
     "generate": "nuxt generate playground",
     "preview": "nuxt preview playground",
     "prepack": "nuxt-module-build build",
     "lint": "eslint .",
-    "test": "nuxi prepare test/fixtures/basic && vitest run",
+    "test": "yarn dev:prepare && nuxi prepare test/fixtures/basic && vitest run",
     "codegen": "graphql-codegen --config playground/codegen.ts"
   },
   "dependencies": {
@@ -56,6 +56,7 @@
     "eslint": "^9.39.2",
     "graphql": "^16.12.0",
     "nuxt": "^4.2.2",
+    "rxjs": "^7.8.2",
     "typescript": "~5.9.3",
     "vitest": "^4.0.16",
     "vue-tsc": "^3.2.2"
@@ -64,6 +65,7 @@
     "@apollo/client": "^4.0.0",
     "@internationalized/date": "^3.0.0",
     "@nuxt/ui": "^4.0.0",
+    "@nuxtjs/i18n": ">=9.0.0",
     "graphql": "^16.0.0"
   },
   "peerDependenciesMeta": {

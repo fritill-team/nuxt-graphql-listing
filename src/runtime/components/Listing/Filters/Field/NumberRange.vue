@@ -1,85 +1,63 @@
-<script setup lang="ts">
-import {computed, ref, watch} from 'vue'
-import type {RangeFilterFieldConfig} from "../../../../types/listing";
-import {useListingI18n} from '../../../../composables/useListingI18n'
-
-const props = defineProps<{
-  field: RangeFilterFieldConfig<string>
-  filters: Record<string, any>
-  // Facets: optional min/max bounds from API
-  facetMin?: number | null
-  facetMax?: number | null
-}>()
-
-const emit = defineEmits<{
-  (e: 'change', patch: Record<string, any>): void
-}>()
-
-const {t} = useListingI18n()
-
-// Computed bounds from facets (with fallbacks)
-const minBound = computed(() => props.facetMin ?? 0)
-const maxBound = computed(() => props.facetMax ?? 1000)
-
-// Local buffered state
-const localGte = ref<number>(0)
-const localLte = ref<number>(0)
-
-// Sync local state from filters (URL) when parent changes
+<script setup>
+import { computed, ref, watch } from "vue";
+import { useListingI18n } from "../../../../composables/useListingI18n";
+const props = defineProps({
+  field: { type: Object, required: true },
+  filters: { type: Object, required: true },
+  facetMin: { type: [Number, null], required: false },
+  facetMax: { type: [Number, null], required: false }
+});
+const emit = defineEmits(["change"]);
+const { t } = useListingI18n();
+const minBound = computed(() => props.facetMin ?? 0);
+const maxBound = computed(() => props.facetMax ?? 1e3);
+const localGte = ref(0);
+const localLte = ref(0);
 watch(
   () => props.filters[props.field.field],
   (val) => {
-    const v = (val ?? {}) as { gte?: number; lte?: number }
-    localGte.value = v.gte ?? minBound.value
-    localLte.value = v.lte ?? maxBound.value
+    const v = val ?? {};
+    localGte.value = v.gte ?? minBound.value;
+    localLte.value = v.lte ?? maxBound.value;
   },
-  {immediate: true, deep: true}
-)
-
-// Also react to facet changes
+  { immediate: true, deep: true }
+);
 watch(
   [() => props.facetMin, () => props.facetMax],
   () => {
-    const current = props.filters[props.field.field] as { gte?: number; lte?: number } | null
-    if (!current?.gte) localGte.value = minBound.value
-    if (!current?.lte) localLte.value = maxBound.value
+    const current = props.filters[props.field.field];
+    if (!current?.gte) localGte.value = minBound.value;
+    if (!current?.lte) localLte.value = maxBound.value;
   }
-)
-
-// Slider model
-const sliderModel = computed<number[]>({
+);
+const sliderModel = computed({
   get() {
-    return [localGte.value ?? minBound.value, localLte.value ?? maxBound.value]
+    return [localGte.value ?? minBound.value, localLte.value ?? maxBound.value];
   },
   set(values) {
-    const [min, max] = values
-    localGte.value = min !== undefined && Number.isFinite(min) ? min : minBound.value
-    localLte.value = max !== undefined && Number.isFinite(max) ? max : maxBound.value
-  },
-})
-
+    const [min, max] = values;
+    localGte.value = min !== void 0 && Number.isFinite(min) ? min : minBound.value;
+    localLte.value = max !== void 0 && Number.isFinite(max) ? max : maxBound.value;
+  }
+});
 function onSubmit() {
-  const patch: Record<string, any> = {}
-
+  const patch = {};
   if (localGte.value == null && localLte.value == null) {
-    patch[props.field.field] = null
+    patch[props.field.field] = null;
   } else {
     patch[props.field.field] = {
       gte: localGte.value,
-      lte: localLte.value,
-    }
+      lte: localLte.value
+    };
   }
-
-  emit("change", patch)
+  emit("change", patch);
 }
-
 function onClear() {
-  localGte.value = minBound.value
-  localLte.value = maxBound.value
-
+  localGte.value = minBound.value;
+  localLte.value = maxBound.value;
   emit("change", {
-    [props.field.field]: null,
-  })
+    [props.field.field]: null
+  });
 }
 </script>
 

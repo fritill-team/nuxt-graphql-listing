@@ -1,32 +1,22 @@
-<script setup lang="ts">
-import type { SwitchGroupFilterFieldConfig } from "../../../../types/listing";
-import { useListingI18n } from '../../../../composables/useListingI18n'
-
-const props = defineProps<{
-	field: SwitchGroupFilterFieldConfig<string>
-	filters: Record<string, any>
-}>()
-
-const emit = defineEmits<{
-	(e: "change", patch: Record<string, any>): void
-}>()
-
-const { t } = useListingI18n()
-
-// Toggle handler for a single switch
-function onToggle(fieldKey: string, checked: boolean) {
-	// When OFF → send null to remove from URL filters
-	emit("change", {
-		[fieldKey]: checked ? true : null,
-	})
+<script setup>
+import { useListingI18n } from "../../../../composables/useListingI18n";
+const props = defineProps({
+  field: { type: Object, required: true },
+  filters: { type: Object, required: true }
+});
+const emit = defineEmits(["change"]);
+const { t } = useListingI18n();
+function onToggle(fieldKey, checked) {
+  emit("change", {
+    [fieldKey]: checked ? true : null
+  });
 }
-
 function clearAll() {
-	const patch: Record<string, any> = {}
-	for (const sw of props.field.switches) {
-		patch[sw.field] = null
-	}
-	emit("change", patch)
+  const patch = {};
+  for (const sw of props.field.switches) {
+    patch[sw.field] = null;
+  }
+  emit("change", patch);
 }
 </script>
 

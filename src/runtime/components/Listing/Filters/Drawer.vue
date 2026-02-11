@@ -1,61 +1,50 @@
-<script setup lang="ts" generic="TFilters, TFacets">
-import Renderer from "./Renderer.vue"
-import type {FilterFieldConfig} from "../../../types/listing"
-import {ref, toRaw, watch} from "vue"
-
-const props = withDefaults(defineProps<{
-  open?: boolean
-  filters: TFilters
-  config: FilterFieldConfig<string>[]
-  facets?: TFacets | null
-}>(), {
-  open: false,
-})
-
-const emit = defineEmits<{
-  (e: 'close', payload: { applied: boolean, filters: TFilters | null }): void
-}>()
-
-const close = () => emit('close', {applied: false, filters: null})
-
+<script setup>
+import Renderer from "./Renderer.vue";
+import { ref, toRaw, watch } from "vue";
+const props = defineProps({
+  open: { type: Boolean, required: false, default: false },
+  filters: { type: null, required: true },
+  config: { type: Array, required: true },
+  facets: { type: null, required: false }
+});
+const emit = defineEmits(["close"]);
+const close = () => emit("close", { applied: false, filters: null });
 const submit = () => {
-  const nextFilters = cloneFilters(localFilters.value)
-  emit('close', {applied: true, filters: nextFilters})
-}
-
-const cloneFilters = (value: TFilters): TFilters => {
-  const raw = toRaw(value)
+  const nextFilters = cloneFilters(localFilters.value);
+  emit("close", { applied: true, filters: nextFilters });
+};
+const cloneFilters = (value) => {
+  const raw = toRaw(value);
   try {
-    return structuredClone(raw) as TFilters
+    return structuredClone(raw);
   } catch {
-    return JSON.parse(JSON.stringify(raw)) as TFilters
+    return JSON.parse(JSON.stringify(raw));
   }
-}
-
-const localFilters = ref<TFilters>(cloneFilters(props.filters))
-const { t } = useListingI18n()
-
+};
+const localFilters = ref(cloneFilters(props.filters));
+const { t } = useListingI18n();
 watch(
   () => props.open,
   (isOpen) => {
     if (isOpen) {
-      localFilters.value = cloneFilters(props.filters)
+      localFilters.value = cloneFilters(props.filters);
     }
-  },
-)
-
-function onFieldChange(patch: Record<string, any>) {
-  localFilters.value = {
-    ...(localFilters.value as any),
-    ...patch,
   }
+);
+function onFieldChange(patch) {
+  localFilters.value = {
+    ...localFilters.value,
+    ...patch
+  };
 }
 </script>
 
 <template>
   <USlideover
     :open="props.open"
-    @update:open="(value) => { if (!value) close() }"
+    @update:open="(value) => {
+  if (!value) close();
+}"
     :title="t('listing.filters')"
   >
     <template #body>

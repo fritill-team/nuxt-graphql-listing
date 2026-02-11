@@ -1,99 +1,62 @@
-<script setup lang="ts" generic="TItem, TFilters, TSort, TFacets">
-import type {FilterFieldConfig, SortDirection, SortOption} from "../../types/listing";
-import type {ButtonProps, AvatarProps} from "#ui/types";
-import {computed, ref, useSlots} from "vue"
+<script setup>
+import { computed, ref, useSlots } from "vue";
 import Topbar from "./Topbar.vue";
-import {useListingI18n} from "../../composables/useListingI18n";
-
-const props = defineProps<{
-  // Filter
-  filters: TFilters
-  filtersConfig: FilterFieldConfig<string>[]
-  facets?: TFacets | null
-
-  // Sort
-  sortConfig: SortOption<string>[]
-  sort: Array<{ field: string; direction: SortDirection }> | null
-
-  // Pagination
-  total: number
-  limit: number
-  offset: number
-
-  // Data
-  items: TItem[]
-  loading: boolean
-  error: Error | null
-
-  // Optional
-  filtersTitle?: string
-  sortLabel?: string
-
-  hasGridSwitch?: boolean
-  viewMode?: 'grid' | 'list'
-  condensed?: boolean
-
-  // Empty state props (passed to UEmpty)
-  emptyTitle?: string
-  emptyDescription?: string
-  emptyIcon?: string
-  emptyAvatar?: AvatarProps
-  emptyActions?: ButtonProps[]
-
-  // Error state props (passed to UError)
-  errorRedirect?: string
-  errorClear?: boolean | ButtonProps
-}>()
-
-const slots = useSlots()
-
-const emit = defineEmits<{
-  (e: 'update:sort', sort: Array<{ field: string; direction: SortDirection }>): void
-  (e: 'update:filters', filters: Partial<TFilters>): void
-  (e: 'update:offset', offset: number): void
-}>()
-
-const {t} = useListingI18n()
-
-
-
-const viewMode = ref(props.viewMode || 'grid')
-
-const showSidebar = computed(() => !props.condensed && props.filtersConfig.length > 0)
-
-
-// Pagination
+import { useListingI18n } from "../../composables/useListingI18n";
+const props = defineProps({
+  filters: { type: null, required: true },
+  filtersConfig: { type: Array, required: true },
+  facets: { type: null, required: false },
+  sortConfig: { type: Array, required: true },
+  sort: { type: [Array, null], required: true },
+  total: { type: Number, required: true },
+  limit: { type: Number, required: true },
+  offset: { type: Number, required: true },
+  items: { type: Array, required: true },
+  loading: { type: Boolean, required: true },
+  error: { type: [Error, null], required: true },
+  filtersTitle: { type: String, required: false },
+  sortLabel: { type: String, required: false },
+  hasGridSwitch: { type: Boolean, required: false },
+  viewMode: { type: String, required: false },
+  condensed: { type: Boolean, required: false },
+  emptyTitle: { type: String, required: false },
+  emptyDescription: { type: String, required: false },
+  emptyIcon: { type: String, required: false },
+  emptyAvatar: { type: Object, required: false },
+  emptyActions: { type: Array, required: false },
+  errorRedirect: { type: String, required: false },
+  errorClear: { type: [Boolean, Object], required: false }
+});
+const slots = useSlots();
+const emit = defineEmits(["update:sort", "update:filters", "update:offset"]);
+const { t } = useListingI18n();
+const viewMode = ref(props.viewMode || "grid");
+const showSidebar = computed(() => !props.condensed && props.filtersConfig.length > 0);
 const page = computed({
   get() {
-    return Math.floor(props.offset / props.limit) + 1
+    return Math.floor(props.offset / props.limit) + 1;
   },
-  set(newPage: number) {
-    const safePage = newPage < 1 ? 1 : newPage
-    emit('update:offset', (safePage - 1) * props.limit)
-  },
-})
+  set(newPage) {
+    const safePage = newPage < 1 ? 1 : newPage;
+    emit("update:offset", (safePage - 1) * props.limit);
+  }
+});
 const pageCount = computed(() => {
-  if (!props.limit || props.limit <= 0) return 1
-  if (!props.total || props.total <= 0) return 1
-  return Math.ceil(props.total / props.limit)
-})
-
+  if (!props.limit || props.limit <= 0) return 1;
+  if (!props.total || props.total <= 0) return 1;
+  return Math.ceil(props.total / props.limit);
+});
 const from = computed(() => {
-  if (!props.total || props.total === 0) return 0
-  return props.offset + 1
-})
-
+  if (!props.total || props.total === 0) return 0;
+  return props.offset + 1;
+});
 const to = computed(() => {
-  if (!props.total || props.total === 0) return 0
-  return Math.min(props.offset + props.items.length, props.total)
-})
-
-
-function onFilterChange(patch: Record<string, any>) {
-  emit('update:filters', patch as Partial<TFilters>)
+  if (!props.total || props.total === 0) return 0;
+  return Math.min(props.offset + props.items.length, props.total);
+});
+function onFilterChange(patch) {
+  emit("update:filters", patch);
 }
-
-
 </script>
 
 <template>
@@ -101,9 +64,9 @@ function onFilterChange(patch: Record<string, any>) {
     <!-- Desktop Filters (md+) -->
     <LazyListingFiltersAsidePanel
       v-if="showSidebar"
-      :filters="filters as any"
+      :filters="filters"
       :config="filtersConfig"
-      :facets="facets as any"
+      :facets="facets"
       @change="onFilterChange"
     />
 
@@ -119,9 +82,9 @@ function onFilterChange(patch: Record<string, any>) {
         :has-grid-switch="hasGridSwitch"
         :condensed="condensed"
         v-model:view-mode="viewMode"
-        :filters="filters as any"
+        :filters="filters"
         :filters-config="filtersConfig"
-        :facets="facets as any"
+        :facets="facets"
         @update:sort="emit('update:sort', $event)"
         @update:filters="emit('update:filters', $event)"
       >
@@ -178,17 +141,17 @@ function onFilterChange(patch: Record<string, any>) {
               :icon="emptyIcon ?? 'i-heroicons-exclamation-triangle'"
               :avatar="emptyAvatar"
               :actions="emptyActions ?? [
-                {
-                  icon: 'i-lucide-refresh-cw',
-                  label: t('listing.empty.resetFilters'),
-                  color: 'neutral',
-                  variant: 'subtle',
-                  onClick: () => {
-                    $emit('update:filters', {} as any)
-                    $emit('update:offset', 0)
-                  }
-                }
-              ]"
+  {
+    icon: 'i-lucide-refresh-cw',
+    label: t('listing.empty.resetFilters'),
+    color: 'neutral',
+    variant: 'subtle',
+    onClick: () => {
+      $emit('update:filters', {});
+      $emit('update:offset', 0);
+    }
+  }
+]"
             >
               <!-- Forward UEmpty slots -->
               <template v-if="slots['empty-header']" #header>
@@ -226,12 +189,11 @@ function onFilterChange(patch: Record<string, any>) {
           />
         </template>
 
-
         <div class="flex items-center justify-between gap-2 mt-6" v-if="!loading && items.length > 0">
           <div class="flex flex-wrap gap-2 text-sm text-neutral dark:text-gray-300 font-medium">
-            <span v-text="t('listing.pagination', {page: page, pageCount: pageCount})"/>
+            <span v-text="t('listing.pagination', { page, pageCount })"/>
             <span class="">•</span>
-            <span v-if="!loading" v-text="t('listing.results', {from, to, total})"/>
+            <span v-if="!loading" v-text="t('listing.results', { from, to, total })"/>
           </div>
           <div class="flex gap-2">
             <UPagination

@@ -10,6 +10,14 @@ export default createConfigForNuxt({
       './playground',
     ],
   },
+}).prepend({
+  ignores: [
+    'src/runtime/**/*.mjs',
+    'src/runtime/**/*.js',
+    'src/runtime/**/*.d.ts',
+    'src/runtime/**/*.d.vue.ts',
+    'src/runtime/**/*.vue.d.ts',
+  ],
 }).append({
   rules: {
     '@typescript-eslint/no-explicit-any': 'off',

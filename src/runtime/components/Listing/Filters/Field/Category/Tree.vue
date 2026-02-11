@@ -1,158 +1,102 @@
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-import type {CategoryTreeFilterFieldConfig} from '../../../../../types/listing'
-import CategoryTreeNode from './TreeNode.vue'
-import { useListingI18n } from '../../../../../composables/useListingI18n'
-
-interface FacetCategory {
-	categoryId: string;
-	pathText?: string | null;
-	treeId?: string
-	translations: {
-		name: string;
-		slug: string;
-		language: string;
-	}[]
+<script setup>
+import { ref, computed } from "vue";
+import CategoryTreeNode from "./TreeNode.vue";
+import { useListingI18n } from "../../../../../composables/useListingI18n";
+const props = defineProps({
+  field: { type: Object, required: true },
+  filters: { type: Object, required: true },
+  facetOptions: { type: Array, required: false }
+});
+const emit = defineEmits(["change"]);
+const { locale, t } = useListingI18n();
+function buildTrees(cats) {
+  const out = {};
+  if (!cats?.length) return out;
+  const nodeMap = /* @__PURE__ */ new Map();
+  for (const c of cats) {
+    const treeKey = c.treeId || "default";
+    if (!out[treeKey]) {
+      out[treeKey] = [];
+    }
+    const path = (c.pathText || "").split(/\s*[>/]\s*/).filter(Boolean);
+    if (!path.length) continue;
+    const translation = c.translations.find((t2) => t2.language === locale.value) || c.translations[0];
+    if (!translation) continue;
+    let currentPath = treeKey;
+    let parentNode = null;
+    for (let i = 0; i < path.length; i++) {
+      const segment = path[i];
+      const fullPath = currentPath + "/" + segment;
+      let node = nodeMap.get(fullPath);
+      if (!node) {
+        const isLeaf = i === path.length - 1;
+        node = {
+          categoryId: isLeaf ? c.categoryId : "",
+          pathText: isLeaf ? c.pathText || "" : "",
+          name: isLeaf ? translation.name : segment,
+          slug: isLeaf ? translation.slug : segment,
+          children: []
+        };
+        if (isLeaf) {
+          node.id = translation.slug;
+        }
+        nodeMap.set(fullPath, node);
+        if (parentNode) {
+          parentNode.children.push(node);
+        } else {
+          out[treeKey].push(node);
+        }
+      } else {
+        if (i === path.length - 1) {
+          node.id = translation.slug;
+          node.name = translation.name;
+          node.slug = translation.slug;
+          node.categoryId = c.categoryId;
+          node.pathText = c.pathText || "";
+        }
+      }
+      parentNode = node;
+      currentPath = fullPath;
+    }
+  }
+  return out;
 }
-
-interface Node {
-	id?: string;
-	name: string;
-	slug: string;
-	categoryId: string;
-	pathText: string;
-	children: Node[]
-}
-
-const props = defineProps<{
-	field: CategoryTreeFilterFieldConfig<string>
-	filters: Record<string, any>
-	facetOptions?: FacetCategory[]
-}>()
-
-const emit = defineEmits<{ (e: 'change', patch: Record<string, any>): void }>()
-
-const { locale, t } = useListingI18n()
-
-function buildTrees(cats: FacetCategory[] | undefined): Record<string, Node[]> {
-	const out: Record<string, Node[]> = {}
-	if (!cats?.length) return out
-
-	// Create a map to store all categories by their full path
-	const nodeMap = new Map<string, Node>()
-
-	for (const c of cats) {
-		const treeKey = c.treeId || 'default'
-
-		if (!out[treeKey]) {
-			out[treeKey] = []
-		}
-
-		const path = (c.pathText || '').split(/\s*[>/]\s*/).filter(Boolean)
-		if (!path.length) continue
-
-		// Get translation for current locale
-		const translation = c.translations.find(t => t.language === locale.value)
-			|| c.translations[0]
-
-		if (!translation) continue
-
-		let currentPath = treeKey
-		let parentNode: Node | null = null
-
-		// Build the path from root to leaf
-		for (let i = 0; i < path.length; i++) {
-			const segment = path[i]
-			const fullPath = currentPath + '/' + segment
-
-			// Check if this node already exists
-			let node = nodeMap.get(fullPath)
-
-			if (!node) {
-				// Create new node
-				const isLeaf = i === path.length - 1
-
-				node = {
-					categoryId: isLeaf ? c.categoryId : '',
-					pathText: isLeaf ? (c.pathText || '') : '',
-					name: isLeaf ? translation.name : segment,
-					slug: isLeaf ? translation.slug : segment,
-					children: []
-				}
-
-				// Only leaf nodes get an ID (the slug)
-				if (isLeaf) {
-					node.id = translation.slug
-				}
-
-				nodeMap.set(fullPath, node)
-
-				// Add to parent's children or root
-				if (parentNode) {
-					parentNode.children.push(node)
-				} else {
-					out[treeKey].push(node)
-				}
-			} else {
-				// Node exists, but if this is the leaf, update its properties
-				if (i === path.length - 1) {
-					node.id = translation.slug
-					node.name = translation.name
-					node.slug = translation.slug
-					node.categoryId = c.categoryId
-					node.pathText = c.pathText || ''
-				}
-			}
-
-			parentNode = node
-			currentPath = fullPath
-		}
-	}
-
-	return out
-}
-
-const trees = computed(() => buildTrees(props.facetOptions))
-
-const selected = computed<string | null>({
-	get: () => props.filters?.[props.field.field] ?? null,
-	set: (val: string | null) => emit('change', {[props.field.field]: val}),
-})
-
+const trees = computed(() => buildTrees(props.facetOptions));
+const selected = computed({
+  get: () => props.filters?.[props.field.field] ?? null,
+  set: (val) => emit("change", { [props.field.field]: val })
+});
 function clearSelection() {
-	selected.value = null
+  selected.value = null;
 }
-
-const expanded = ref<Record<string, boolean>>({})
-
-function onToggle(pathKey: string) {
-	expanded.value[pathKey] = !expanded.value[pathKey]
+const expanded = ref({});
+function onToggle(pathKey) {
+  expanded.value[pathKey] = !expanded.value[pathKey];
 }
-
-function onSelect(slug: string) {
-	selected.value = slug
+function onSelect(slug) {
+  selected.value = slug;
 }
 </script>
 
 <template>
 	<div>
 		<div class="flex items-center justify-between mb-2">
-			<span class="text-sm font-semibold">{{ field.label || t('listing.categories') }}</span>
+			<span class="text-sm font-semibold">{{ field.label || t("listing.categories") }}</span>
 			<UButton size="xs" color="neutral" variant="ghost" @click="clearSelection" :disabled="!selected">
-				{{ t('listing.clear') }}
+				{{ t("listing.clear") }}
 			</UButton>
 		</div>
 		<div v-if="!facetOptions || facetOptions.length === 0" class="text-sm text-neutral-500">
-			{{ t('listing.noCategories') }}
+			{{ t("listing.noCategories") }}
 		</div>
 		<div v-else class="text-sm">
-			<template v-for="(nodes, treeId) in trees" :key="treeId as string">
+			<template v-for="(nodes, treeId) in trees" :key="treeId">
 				<ul class="m-0 p-0">
 					<CategoryTreeNode
 						v-for="(node, idx) in nodes"
-						:key="(treeId as string) + '/' + node.slug + '-' + idx"
+						:key="treeId + '/' + node.slug + '-' + idx"
 						:node="node"
-						:path-key="(treeId as string) + '/' + node.slug + '-' + idx"
+						:path-key="treeId + '/' + node.slug + '-' + idx"
 						:selected="selected"
 						:expanded="expanded"
 						@toggle="onToggle"

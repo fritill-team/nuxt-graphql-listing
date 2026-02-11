@@ -1,74 +1,55 @@
-<script setup lang="ts">
-import { computed } from 'vue'
-import type {RatingFilterFieldConfig, RatingFacet} from "../../../../types/listing"
-import { useListingI18n } from '../../../../composables/useListingI18n'
-
-const props = defineProps<{
-	field: RatingFilterFieldConfig<string>
-	filters: Record<string, any>
-	/** Rating facet data with counts per rating value */
-	facetOptions?: RatingFacet[] | null
-}>()
-
-const { t } = useListingI18n()
-
-const emit = defineEmits<{
-	(e: "change", patch: Record<string, any>): void
-}>()
-
-// rating options (4★+, 3★+, 2★+, 1★+) - can be overridden by field.steps
-const ratingSteps = computed(() => props.field.steps ?? [4, 3, 2, 1])
-
-// Map facet data to counts by rating value
-const facetCounts = computed<Record<number, number>>(() => {
-	if (!props.facetOptions?.length) return {}
-	const counts: Record<number, number> = {}
-	for (const f of props.facetOptions) {
-		counts[f.value] = f.count ?? 0
-	}
-	return counts
-})
-
-// current value comes from URL-backed filters object: expect { gte: number }
-const currentValue = computed<number | null>(() => {
-  const raw = props.filters[props.field.field]
-  if (raw && typeof raw === 'object' && typeof raw.gte === 'number') return raw.gte
-  if (typeof raw === 'number') return raw
-  return null
-})
-
-// v-model bridge for URadioGroup
-const radioModel = computed<number | null>({
-	get() {
-		return currentValue.value
-	},
-	set(val) {
-		onSelect(val)
-	},
-})
-
-// URadioGroup options: last one is "any" → null
-const radioOptions = computed(() => [
-	...ratingSteps.value.map((n) => ({
-		value: n,
-		// label is overridden by slot, but keep something for a11y
-		label: `${n}★+`,
-		count: facetCounts.value[n],
-	})),
-	{
-		value: null,
-		label: t("listing.rating.any"),
-		count: undefined,
-	},
-])
-
-// emit patch in the unified shape used by ListingFiltersPanel / useListing
-function onSelect(value: number | null) {
-  if (value == null) {
-    emit('change', { [props.field.field]: null })
-    return
+<script setup>
+import { computed } from "vue";
+import { useListingI18n } from "../../../../composables/useListingI18n";
+const props = defineProps({
+  field: { type: Object, required: true },
+  filters: { type: Object, required: true },
+  facetOptions: { type: [Array, null], required: false }
+});
+const { t } = useListingI18n();
+const emit = defineEmits(["change"]);
+const ratingSteps = computed(() => props.field.steps ?? [4, 3, 2, 1]);
+const facetCounts = computed(() => {
+  if (!props.facetOptions?.length) return {};
+  const counts = {};
+  for (const f of props.facetOptions) {
+    counts[f.value] = f.count ?? 0;
   }
-  emit('change', { [props.field.field]: { gte: value } })
+  return counts;
+});
+const currentValue = computed(() => {
+  const raw = props.filters[props.field.field];
+  if (raw && typeof raw === "object" && typeof raw.gte === "number") return raw.gte;
+  if (typeof raw === "number") return raw;
+  return null;
+});
+const radioModel = computed({
+  get() {
+    return currentValue.value;
+  },
+  set(val) {
+    onSelect(val);
+  }
+});
+const radioOptions = computed(() => [
+  ...ratingSteps.value.map((n) => ({
+    value: n,
+    // label is overridden by slot, but keep something for a11y
+    label: `${n}\u2605+`,
+    count: facetCounts.value[n]
+  })),
+  {
+    value: null,
+    label: t("listing.rating.any"),
+    count: void 0
+  }
+]);
+function onSelect(value) {
+  if (value == null) {
+    emit("change", { [props.field.field]: null });
+    return;
+  }
+  emit("change", { [props.field.field]: { gte: value } });
 }
 </script>
 
@@ -91,11 +72,11 @@ function onSelect(value: number | null) {
 				<template v-if="item.value === null">
           <span
 	          :class="[
-              'text-neutral-600 dark:text-gray-100 text-sm',
-              radioModel === null ? 'font-semibold' : '',
-            ]"
+  'text-neutral-600 dark:text-gray-100 text-sm',
+  radioModel === null ? 'font-semibold' : ''
+]"
           >
-            {{ t('listing.rating.any') }}
+            {{ t("listing.rating.any") }}
           </span>
 				</template>
 
@@ -113,7 +94,7 @@ function onSelect(value: number | null) {
               />
             </template>
             <span class="ml-1 text-sm text-neutral-600 dark:text-gray-100">
-              {{ t('listing.rating.up') }}
+              {{ t("listing.rating.up") }}
             </span>
             <span v-if="item.count != null" class="ml-1 text-xs text-neutral-400">
               ({{ item.count }})

@@ -1,7 +1,6 @@
-<script setup lang="ts">
-import { useListingI18n } from '../../composables/useListingI18n'
-
-const { t } = useListingI18n()
+<script setup>
+import { useListingI18n } from "../../composables/useListingI18n";
+const { t } = useListingI18n();
 </script>
 
 <template>
@@ -10,7 +9,7 @@ const { t } = useListingI18n()
 			class="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900 dark:border-gray-100"
 		/>
 		<p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
-			{{ t('listing.loading') }}
+			{{ t("listing.loading") }}
 		</p>
 	</div>
 </template>

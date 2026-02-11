@@ -1,73 +1,53 @@
-<script setup lang="ts">
-import { computed } from 'vue'
-import type { SortDirection, SortOption } from '../../../types/listing'
-import type { SortFieldInput } from '#layers/courses/types/generated'
-import { useListingI18n } from '../../../composables/useListingI18n'
-
-const props = defineProps<{
-	options: SortOption<string>[]
-	sort: Array<{ field: string; direction: SortDirection }> | null | undefined
-	/** Label shown before the dropdown */
-	label?: string
-}>()
-
-const emit = defineEmits<{
-	(e: 'change', sort: Array<{ field: string; direction: SortDirection }>): void
-}>()
-
-const { t } = useListingI18n()
-
-// Create a unique key for each sort option (field:direction)
-function optionKey(opt: SortOption<string>): string {
-	return `${opt.field}:${opt.direction}`
+<script setup>
+import { computed } from "vue";
+import { useListingI18n } from "../../../composables/useListingI18n";
+const props = defineProps({
+  options: { type: Array, required: true },
+  sort: { type: null, required: true },
+  label: { type: String, required: false }
+});
+const emit = defineEmits(["change"]);
+const { t } = useListingI18n();
+function optionKey(opt) {
+  return `${opt.field}:${opt.direction}`;
 }
-
-// Parse the key back to field/direction
-function parseKey(key: string): { field: string; direction: SortDirection } | null {
-	const [field, dir] = key.split(':')
-	if (field && (dir === 'ASC' || dir === 'DESC')) {
-		return { field, direction: dir as SortDirection }
-	}
-	return null
+function parseKey(key) {
+  const [field, dir] = key.split(":");
+  if (field && (dir === "ASC" || dir === "DESC")) {
+    return { field, direction: dir };
+  }
+  return null;
 }
-
-// Current selection as "field:direction" string
 const selectedKey = computed({
-	get() {
-		if (!props.sort || props.sort.length === 0) return ''
-		const first = props.sort[0] as SortFieldInput
-		return `${first.field}:${first.direction}`
-	},
-	set(key: string) {
-		if (!key) {
-			emit('change', [])
-			return
-		}
-		const parsed = parseKey(key)
-		if (parsed) {
-			emit('change', [parsed])
-		}
-	},
-})
-
-// Transform options for UDropdownMenu
+  get() {
+    if (!props.sort || props.sort.length === 0) return "";
+    const first = props.sort[0];
+    return `${first.field}:${first.direction}`;
+  },
+  set(key) {
+    if (!key) {
+      emit("change", []);
+      return;
+    }
+    const parsed = parseKey(key);
+    if (parsed) {
+      emit("change", [parsed]);
+    }
+  }
+});
 const selectOptions = computed(() => {
-	return props.options.map((opt) => ({
-		label: opt.label,
-		value: optionKey(opt),
-		onSelect: () => emit('change', [opt]),
-	}))
-})
-
-// ✅ Label that includes the selected item's label
+  return props.options.map((opt) => ({
+    label: opt.label,
+    value: optionKey(opt),
+    onSelect: () => emit("change", [opt])
+  }));
+});
 const buttonLabel = computed(() => {
-	const key = selectedKey.value
-	const selected = props.options.find((opt) => optionKey(opt) === key)
-	const selectedText = selected?.label ?? '' // empty if nothing selected
-
-	// Assuming translation like: "Sort by {{label}}"
-	return t('listing.sortBy', { label: selectedText })
-})
+  const key = selectedKey.value;
+  const selected = props.options.find((opt) => optionKey(opt) === key);
+  const selectedText = selected?.label ?? "";
+  return t("listing.sortBy", { label: selectedText });
+});
 </script>
 
 <template>

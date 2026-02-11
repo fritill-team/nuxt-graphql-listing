@@ -1,45 +1,30 @@
-<script setup lang="ts">
-import { computed } from 'vue'
-import { useListingI18n } from '../../../../../composables/useListingI18n'
-
-type Node = {
-	name: string;
-	slug: string;
-	id?: string;
-	children: Node[]
-}
-
-const props = defineProps<{
-	node: Node
-	pathKey: string
-	selected: string | null
-	expanded: Record<string, boolean>
-}>()
-
-const emit = defineEmits<{
-	(e: 'toggle' | 'select', value: string): void
-}>()
-
-const { t } = useListingI18n()
-
-const hasChildren = computed(() => props.node.children && props.node.children.length > 0)
-const isExpanded = computed(() => props.expanded[props.pathKey] ?? true)
-const isSelectable = computed(() => !!props.node.id)
-const isSelected = computed(() => props.selected === props.node.id)
-
+<script setup>
+import { computed } from "vue";
+import { useListingI18n } from "../../../../../composables/useListingI18n";
+const props = defineProps({
+  node: { type: Object, required: true },
+  pathKey: { type: String, required: true },
+  selected: { type: [String, null], required: true },
+  expanded: { type: Object, required: true }
+});
+const emit = defineEmits(["toggle", "select"]);
+const { t } = useListingI18n();
+const hasChildren = computed(() => props.node.children && props.node.children.length > 0);
+const isExpanded = computed(() => props.expanded[props.pathKey] ?? true);
+const isSelectable = computed(() => !!props.node.id);
+const isSelected = computed(() => props.selected === props.node.id);
 function toggle() {
-	emit('toggle', props.pathKey)
+  emit("toggle", props.pathKey);
 }
-
 function select() {
-	if (props.node.id) {
-		emit('select', props.node.id)
-	}
+  if (props.node.id) {
+    emit("select", props.node.id);
+  }
 }
 </script>
 
 <template>
-	<li class="my-0.5" role="treeitem" :aria-expanded="hasChildren ? isExpanded : undefined">
+	<li class="my-0.5" role="treeitem" :aria-expanded="hasChildren ? isExpanded : void 0">
 		<div class="flex items-center gap-2">
 			<button
 				v-if="hasChildren"
@@ -59,18 +44,18 @@ function select() {
 				type="button"
 				class="text-start flex-1 py-0.5 px-1 rounded transition-colors"
 				:class="[
-          isSelectable ? 'hover:bg-neutral-50 dark:hover:bg-neutral-900 cursor-pointer' : 'cursor-default opacity-60',
-          isSelected && 'bg-neutral-100 dark:bg-neutral-800'
-        ]"
+  isSelectable ? 'hover:bg-neutral-50 dark:hover:bg-neutral-900 cursor-pointer' : 'cursor-default opacity-60',
+  isSelected && 'bg-neutral-100 dark:bg-neutral-800'
+]"
 				:disabled="!isSelectable"
 				:aria-selected="isSelected"
 				@click="select"
 			>
         <span
 	        :class="[
-            isSelected && 'font-semibold text-primary-600 dark:text-primary-400',
-            !isSelectable && 'text-neutral-500'
-          ]"
+  isSelected && 'font-semibold text-primary-600 dark:text-primary-400',
+  !isSelectable && 'text-neutral-500'
+]"
         >
           {{ node.name }}
         </span>

@@ -16,6 +16,13 @@ node_modules
 # Generated dirs
 dist
 
+# Generated stubs (nuxt-module-build build --stub)
+src/runtime/**/*.mjs
+src/runtime/**/*.js
+src/runtime/**/*.d.ts
+src/runtime/**/*.d.vue.ts
+src/runtime/**/*.vue.d.ts
+
 # Nuxt
 .nuxt
 .output

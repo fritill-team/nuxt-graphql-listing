@@ -1,72 +1,54 @@
-<script setup lang="ts">
-import { computed } from 'vue'
-import type { SwitchMultiFilterFieldConfig, OptionFacet } from '../../../../types/listing'
-import { useListingI18n } from '../../../../composables/useListingI18n'
-
-const props = defineProps<{
-	field: SwitchMultiFilterFieldConfig<string>
-	filters: Record<string, any>
-	/** Dynamic options from facets (adds counts to options) */
-	facetOptions?: OptionFacet[] | null
-}>()
-
-const emit = defineEmits<{
-	(e: 'change', patch: Record<string, any>): void
-}>()
-
-const { t } = useListingI18n()
-
-// current selected values for this single field (array from filters / URL)
-const selectedValues = computed<(string | number | boolean)[]>(() => {
-	const raw = props.filters[props.field.field]
-	if (!raw) return []
-	if (Array.isArray(raw)) return raw as (string | number | boolean)[]
-	return [raw as string | number | boolean]
-})
-
-// Map facet data to counts by value
-const facetCounts = computed<Record<string | number, number>>(() => {
-	if (!props.facetOptions?.length) return {}
-	const counts: Record<string | number, number> = {}
-	for (const f of props.facetOptions) {
-		counts[String(f.value)] = f.count ?? 0
-	}
-	return counts
-})
-
-// Options with counts from facets
+<script setup>
+import { computed } from "vue";
+import { useListingI18n } from "../../../../composables/useListingI18n";
+const props = defineProps({
+  field: { type: Object, required: true },
+  filters: { type: Object, required: true },
+  facetOptions: { type: [Array, null], required: false }
+});
+const emit = defineEmits(["change"]);
+const { t } = useListingI18n();
+const selectedValues = computed(() => {
+  const raw = props.filters[props.field.field];
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  return [raw];
+});
+const facetCounts = computed(() => {
+  if (!props.facetOptions?.length) return {};
+  const counts = {};
+  for (const f of props.facetOptions) {
+    counts[String(f.value)] = f.count ?? 0;
+  }
+  return counts;
+});
 const optionsWithCounts = computed(() => {
-	return props.field.options.map(opt => ({
-		...opt,
-		count: facetCounts.value[String(opt.value)],
-	}))
-})
-
-function onToggle(optionValue: string | number | boolean, checked: boolean) {
-	const current = selectedValues.value
-	let next: (string | number | boolean)[]
-
-	if (checked) {
-		// add if not present
-		if (current.includes(optionValue)) {
-			next = current
-		} else {
-			next = [...current, optionValue]
-		}
-	} else {
-		// remove from array
-		next = current.filter((v) => v !== optionValue)
-	}
-
-	emit('change', {
-		[props.field.field]: next.length ? next : null, // null → removed from URL
-	})
+  return props.field.options.map((opt) => ({
+    ...opt,
+    count: facetCounts.value[String(opt.value)]
+  }));
+});
+function onToggle(optionValue, checked) {
+  const current = selectedValues.value;
+  let next;
+  if (checked) {
+    if (current.includes(optionValue)) {
+      next = current;
+    } else {
+      next = [...current, optionValue];
+    }
+  } else {
+    next = current.filter((v) => v !== optionValue);
+  }
+  emit("change", {
+    [props.field.field]: next.length ? next : null
+    // null → removed from URL
+  });
 }
-
 function clearAll() {
-	emit('change', {
-		[props.field.field]: null,
-	})
+  emit("change", {
+    [props.field.field]: null
+  });
 }
 </script>
 
@@ -85,7 +67,7 @@ function clearAll() {
 				size="xs"
 				@click="clearAll"
 			>
-				{{ t('listing.clear') }}
+				{{ t("listing.clear") }}
 			</UButton>
 		</div>
 
