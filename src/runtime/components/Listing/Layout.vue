@@ -89,9 +89,11 @@ function onFilterChange(patch) {
         @update:filters="emit('update:filters', $event)"
       >
         <template #start>
-          <slot name="top-bar-start">
-            <div class="font-semibold">Toolbar</div>
-          </slot>
+          <slot name="top-bar-start"/>
+        </template>
+
+        <template #end>
+          <slot name="top-bar-end"/>
         </template>
       </Topbar>
 
