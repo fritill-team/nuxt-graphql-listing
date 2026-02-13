@@ -1,13 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useListingI18n } from "../../../../composables/useListingI18n";
-const props = defineProps({
-  field: { type: Object, required: true },
-  filters: { type: Object, required: true },
-  facetMin: { type: [Number, null], required: false },
-  facetMax: { type: [Number, null], required: false }
+import type { RangeFilterFieldConfig } from "../../../../types/listing";
+const props = withDefaults(defineProps<{
+  field: RangeFilterFieldConfig
+  filters: Record<string, any>
+  facetMin?: number | null
+  facetMax?: number | null
+}>(), {
+  facetMin: undefined,
+  facetMax: undefined
 });
-const emit = defineEmits(["change"]);
+const emit = defineEmits<{
+  change: [patch: Record<string, any>]
+}>();
 const { t } = useListingI18n();
 const minBound = computed(() => props.facetMin ?? 0);
 const maxBound = computed(() => props.facetMax ?? 1e3);

@@ -1,34 +1,62 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, useSlots } from "vue";
 import Topbar from "./Topbar.vue";
 import { useListingI18n } from "../../composables/useListingI18n";
-const props = defineProps({
-  filters: { type: null, required: true },
-  filtersConfig: { type: Array, required: true },
-  facets: { type: null, required: false },
-  sortConfig: { type: Array, required: true },
-  sort: { type: [Array, null], required: true },
-  total: { type: Number, required: true },
-  limit: { type: Number, required: true },
-  offset: { type: Number, required: true },
-  items: { type: Array, required: true },
-  loading: { type: Boolean, required: true },
-  error: { type: [Error, null], required: true },
-  filtersTitle: { type: String, required: false },
-  sortLabel: { type: String, required: false },
-  hasGridSwitch: { type: Boolean, required: false },
-  viewMode: { type: String, required: false },
-  condensed: { type: Boolean, required: false },
-  emptyTitle: { type: String, required: false },
-  emptyDescription: { type: String, required: false },
-  emptyIcon: { type: String, required: false },
-  emptyAvatar: { type: Object, required: false },
-  emptyActions: { type: Array, required: false },
-  errorRedirect: { type: String, required: false },
-  errorClear: { type: [Boolean, Object], required: false }
+import type { SortOption, SortInput, FilterFieldConfig, FieldKeyedFacets } from "../../types/listing";
+
+interface EmptyAction {
+  icon?: string
+  label: string
+  color?: string
+  variant?: string
+  onClick?: () => void
+}
+
+const props = withDefaults(defineProps<{
+  filters: Record<string, any>
+  filtersConfig: FilterFieldConfig[]
+  facets?: FieldKeyedFacets | null
+  sortConfig: SortOption[]
+  sort: SortInput[] | null
+  total: number
+  limit: number
+  offset: number
+  items: any[]
+  loading: boolean
+  error: Error | null
+  filtersTitle?: string
+  sortLabel?: string
+  hasGridSwitch?: boolean
+  viewMode?: string
+  condensed?: boolean
+  emptyTitle?: string
+  emptyDescription?: string
+  emptyIcon?: string
+  emptyAvatar?: Record<string, any>
+  emptyActions?: EmptyAction[]
+  errorRedirect?: string
+  errorClear?: boolean | Record<string, any>
+}>(), {
+  facets: undefined,
+  filtersTitle: undefined,
+  sortLabel: undefined,
+  hasGridSwitch: false,
+  viewMode: undefined,
+  condensed: false,
+  emptyTitle: undefined,
+  emptyDescription: undefined,
+  emptyIcon: undefined,
+  emptyAvatar: undefined,
+  emptyActions: undefined,
+  errorRedirect: undefined,
+  errorClear: undefined
 });
 const slots = useSlots();
-const emit = defineEmits(["update:sort", "update:filters", "update:offset"]);
+const emit = defineEmits<{
+  'update:sort': [value: SortInput[]]
+  'update:filters': [value: Record<string, any>]
+  'update:offset': [value: number]
+}>();
 const { t } = useListingI18n();
 const viewMode = ref(props.viewMode || "grid");
 const showSidebar = computed(() => !props.condensed && props.filtersConfig.length > 0);
@@ -54,7 +82,7 @@ const to = computed(() => {
   if (!props.total || props.total === 0) return 0;
   return Math.min(props.offset + props.items.length, props.total);
 });
-function onFilterChange(patch) {
+function onFilterChange(patch: Record<string, any>): void {
   emit("update:filters", patch);
 }
 </script>

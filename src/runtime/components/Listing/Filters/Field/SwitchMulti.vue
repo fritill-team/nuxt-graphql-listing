@@ -1,12 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
 import { useListingI18n } from "../../../../composables/useListingI18n";
-const props = defineProps({
-  field: { type: Object, required: true },
-  filters: { type: Object, required: true },
-  facetOptions: { type: [Array, null], required: false }
+import type { SwitchMultiFilterFieldConfig, OptionFacet } from "../../../../types/listing";
+const props = withDefaults(defineProps<{
+  field: SwitchMultiFilterFieldConfig
+  filters: Record<string, any>
+  facetOptions?: OptionFacet[] | null
+}>(), {
+  facetOptions: undefined
 });
-const emit = defineEmits(["change"]);
+const emit = defineEmits<{
+  change: [patch: Record<string, any>]
+}>();
 const { t } = useListingI18n();
 const selectedValues = computed(() => {
   const raw = props.filters[props.field.field];
@@ -28,7 +33,7 @@ const optionsWithCounts = computed(() => {
     count: facetCounts.value[String(opt.value)]
   }));
 });
-function onToggle(optionValue, checked) {
+function onToggle(optionValue: string | number | boolean, checked: boolean) {
   const current = selectedValues.value;
   let next;
   if (checked) {

@@ -1,10 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
-const props = defineProps({
-  modelValue: { type: String, required: true },
-  label: { type: String, required: false }
+const props = withDefaults(defineProps<{
+  modelValue: string
+  label?: string
+}>(), {
+  label: undefined
 });
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits<{
+  'update:modelValue': [value: string]
+}>();
 const isGrid = computed(() => props.modelValue === "grid");
 const setGrid = () => {
   if (!isGrid.value) emit("update:modelValue", "grid");

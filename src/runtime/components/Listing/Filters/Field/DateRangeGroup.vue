@@ -1,12 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, shallowRef, watch, useTemplateRef } from "vue";
 import { CalendarDate, getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import { useListingI18n } from "../../../../composables/useListingI18n";
-const props = defineProps({
-  field: { type: Object, required: true },
-  filters: { type: Object, required: true }
-});
-const emit = defineEmits(["change"]);
+import type { DateTimeRangeGroupFilterFieldConfig } from "../../../../types/listing";
+const props = defineProps<{
+  field: DateTimeRangeGroupFilterFieldConfig
+  filters: Record<string, any>
+}>();
+const emit = defineEmits<{
+  change: [patch: Record<string, any>]
+}>();
 const { t } = useListingI18n();
 const activeField = ref("");
 const fields = computed(() => props.field.dateFields.map((df) => ({
@@ -14,8 +17,8 @@ const fields = computed(() => props.field.dateFields.map((df) => ({
   value: df.field
 })));
 const showDateRange = ref(false);
-const rangeModel = shallowRef(null);
-function dateStrToCalendarDate(value) {
+const rangeModel = shallowRef<{ start: CalendarDate; end: CalendarDate } | null>(null);
+function dateStrToCalendarDate(value: string): CalendarDate | null {
   if (!value) return null;
   const datePart = value.slice(0, 10);
   try {
@@ -24,7 +27,7 @@ function dateStrToCalendarDate(value) {
     return null;
   }
 }
-function calendarDateToStr(date) {
+function calendarDateToStr(date: CalendarDate): string {
   const y = date.year.toString().padStart(4, "0");
   const m = date.month.toString().padStart(2, "0");
   const d = date.day.toString().padStart(2, "0");

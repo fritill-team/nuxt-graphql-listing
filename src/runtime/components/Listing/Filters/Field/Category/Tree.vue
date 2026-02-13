@@ -1,15 +1,30 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
 import CategoryTreeNode from "./TreeNode.vue";
 import { useListingI18n } from "../../../../../composables/useListingI18n";
-const props = defineProps({
-  field: { type: Object, required: true },
-  filters: { type: Object, required: true },
-  facetOptions: { type: Array, required: false }
+import type { CategoryTreeFilterFieldConfig, CategoryFacet } from "../../../../../types/listing";
+
+interface TreeNode {
+  id?: string
+  categoryId: string
+  pathText: string
+  name: string
+  slug: string
+  children: TreeNode[]
+}
+
+const props = withDefaults(defineProps<{
+  field: CategoryTreeFilterFieldConfig
+  filters: Record<string, any>
+  facetOptions?: CategoryFacet[]
+}>(), {
+  facetOptions: undefined
 });
-const emit = defineEmits(["change"]);
+const emit = defineEmits<{
+  change: [patch: Record<string, any>]
+}>();
 const { locale, t } = useListingI18n();
-function buildTrees(cats) {
+function buildTrees(cats: CategoryFacet[] | undefined): Record<string, TreeNode[]> {
   const out = {};
   if (!cats?.length) return out;
   const nodeMap = /* @__PURE__ */ new Map();
@@ -69,11 +84,11 @@ const selected = computed({
 function clearSelection() {
   selected.value = null;
 }
-const expanded = ref({});
-function onToggle(pathKey) {
+const expanded = ref<Record<string, boolean>>({});
+function onToggle(pathKey: string) {
   expanded.value[pathKey] = !expanded.value[pathKey];
 }
-function onSelect(slug) {
+function onSelect(slug: string) {
   selected.value = slug;
 }
 </script>

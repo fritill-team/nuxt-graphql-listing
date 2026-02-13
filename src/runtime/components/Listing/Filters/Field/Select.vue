@@ -1,11 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
-const props = defineProps({
-  field: { type: Object, required: true },
-  filters: { type: Object, required: true },
-  facetOptions: { type: [Array, null], required: false }
+import type { SelectFilterFieldConfig, OptionFacet } from "../../../../types/listing";
+const props = withDefaults(defineProps<{
+  field: SelectFilterFieldConfig
+  filters: Record<string, any>
+  facetOptions?: OptionFacet[] | null
+}>(), {
+  facetOptions: undefined
 });
-const emit = defineEmits(["change"]);
+const emit = defineEmits<{
+  change: [patch: Record<string, any>]
+}>();
 const value = computed({
   get() {
     return props.filters[props.field.field];

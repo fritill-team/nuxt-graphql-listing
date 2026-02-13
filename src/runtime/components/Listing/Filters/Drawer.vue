@@ -1,19 +1,29 @@
-<script setup>
+<script setup lang="ts">
 import Renderer from "./Renderer.vue";
 import { ref, toRaw, watch } from "vue";
-const props = defineProps({
-  open: { type: Boolean, required: false, default: false },
-  filters: { type: null, required: true },
-  config: { type: Array, required: true },
-  facets: { type: null, required: false }
+import type { FilterFieldConfig, FieldKeyedFacets } from "../../../types/listing";
+
+interface DrawerResult {
+  applied: boolean
+  filters: Record<string, any> | null
+}
+
+const props = withDefaults(defineProps<{
+  filters: Record<string, any>
+  config: FilterFieldConfig[]
+  facets?: FieldKeyedFacets | null
+}>(), {
+  facets: undefined
 });
-const emit = defineEmits(["close"]);
+const emit = defineEmits<{
+  close: [result: DrawerResult]
+}>();
 const close = () => emit("close", { applied: false, filters: null });
 const submit = () => {
   const nextFilters = cloneFilters(localFilters.value);
   emit("close", { applied: true, filters: nextFilters });
 };
-const cloneFilters = (value) => {
+const cloneFilters = (value: Record<string, any>): Record<string, any> => {
   const raw = toRaw(value);
   try {
     return structuredClone(raw);
@@ -24,14 +34,12 @@ const cloneFilters = (value) => {
 const localFilters = ref(cloneFilters(props.filters));
 const { t } = useListingI18n();
 watch(
-  () => props.open,
-  (isOpen) => {
-    if (isOpen) {
-      localFilters.value = cloneFilters(props.filters);
-    }
+  () => props.filters,
+  () => {
+    localFilters.value = cloneFilters(props.filters);
   }
 );
-function onFieldChange(patch) {
+function onFieldChange(patch: Record<string, any>): void {
   localFilters.value = {
     ...localFilters.value,
     ...patch
@@ -41,10 +49,7 @@ function onFieldChange(patch) {
 
 <template>
   <USlideover
-    :open="props.open"
-    @update:open="(value) => {
-  if (!value) close();
-}"
+    :close="{ onClick: () => emit('close', { applied: false, filters: null }) }"
     :title="t('listing.filters')"
   >
     <template #body>

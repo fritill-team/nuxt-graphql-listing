@@ -1,20 +1,25 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
 import { useListingI18n } from "../../../composables/useListingI18n";
-const props = defineProps({
-  options: { type: Array, required: true },
-  sort: { type: null, required: true },
-  label: { type: String, required: false }
+import type { SortOption, SortInput, SortDirection } from "../../../types/listing";
+const props = withDefaults(defineProps<{
+  options: SortOption[]
+  sort: SortInput[] | null
+  label?: string
+}>(), {
+  label: undefined
 });
-const emit = defineEmits(["change"]);
+const emit = defineEmits<{
+  change: [value: SortInput[]]
+}>();
 const { t } = useListingI18n();
-function optionKey(opt) {
+function optionKey(opt: SortOption): string {
   return `${opt.field}:${opt.direction}`;
 }
-function parseKey(key) {
+function parseKey(key: string): SortInput | null {
   const [field, dir] = key.split(":");
   if (field && (dir === "ASC" || dir === "DESC")) {
-    return { field, direction: dir };
+    return { field, direction: dir as SortDirection };
   }
   return null;
 }

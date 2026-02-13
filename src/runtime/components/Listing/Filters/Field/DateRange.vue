@@ -1,12 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
-const props = defineProps({
-  field: { type: Object, required: true },
-  filters: { type: Object, required: true }
-});
-const emit = defineEmits(["change"]);
-const current = computed(() => props.filters[props.field.field] ?? {});
-function update(part, raw) {
+import type { RangeFilterFieldConfig, RangeValue } from "../../../../types/listing";
+const props = defineProps<{
+  field: RangeFilterFieldConfig
+  filters: Record<string, any>
+}>();
+const emit = defineEmits<{
+  change: [patch: Record<string, any>]
+}>();
+const current = computed<RangeValue<string>>(() => props.filters[props.field.field] ?? {});
+function update(part: string, raw: string | null) {
   const val = raw === "" || raw == null ? null : raw;
   const next = {
     eq: current.value.eq ?? null,

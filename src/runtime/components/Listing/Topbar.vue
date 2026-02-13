@@ -1,22 +1,34 @@
-<script setup>
+<script setup lang="ts">
 import ViewModeSwitch from "./ViewModeSwitch.vue";
 import { computed } from "vue";
 import Drawer from "./Filters/Drawer.vue";
 import Sort from "./Filters/Sort.vue";
 import { useOverlay } from "#imports";
 import { useListingI18n } from "../../composables";
-const props = defineProps({
-  hasGridSwitch: { type: Boolean, required: false },
-  viewMode: { type: String, required: false, default: "grid" },
-  sortConfig: { type: Array, required: true },
-  sort: { type: [Array, null], required: false, default: null },
-  sortLabel: { type: String, required: false },
-  filters: { type: null, required: true },
-  filtersConfig: { type: Array, required: true },
-  facets: { type: null, required: false },
-  condensed: { type: Boolean, required: false, default: false }
+import type { SortOption, SortInput, FilterFieldConfig, FieldKeyedFacets } from "../../types/listing";
+const props = withDefaults(defineProps<{
+  hasGridSwitch?: boolean
+  viewMode?: string
+  sortConfig: SortOption[]
+  sort?: SortInput[] | null
+  sortLabel?: string
+  filters: Record<string, any>
+  filtersConfig: FilterFieldConfig[]
+  facets?: FieldKeyedFacets | null
+  condensed?: boolean
+}>(), {
+  hasGridSwitch: false,
+  viewMode: "grid",
+  sort: null,
+  sortLabel: undefined,
+  facets: undefined,
+  condensed: false
 });
-const emit = defineEmits(["update:viewMode", "update:sort", "update:filters"]);
+const emit = defineEmits<{
+  'update:viewMode': [value: string]
+  'update:sort': [value: SortInput[]]
+  'update:filters': [value: Record<string, any>]
+}>();
 const { t } = useListingI18n();
 const viewMode = computed({
   get: () => props.viewMode,
@@ -31,7 +43,7 @@ const openDrawer = async () => {
     facets: props.facets
   });
   const result = await instance.result;
-  if (result.applied) {
+  if (result.applied && result.filters) {
     emit("update:filters", result.filters);
   }
 };

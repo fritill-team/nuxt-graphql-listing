@@ -1,13 +1,26 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
 import { useListingI18n } from "../../../../../composables/useListingI18n";
-const props = defineProps({
-  node: { type: Object, required: true },
-  pathKey: { type: String, required: true },
-  selected: { type: [String, null], required: true },
-  expanded: { type: Object, required: true }
-});
-const emit = defineEmits(["toggle", "select"]);
+
+interface TreeNodeData {
+  id?: string
+  categoryId: string
+  pathText: string
+  name: string
+  slug: string
+  children: TreeNodeData[]
+}
+
+const props = defineProps<{
+  node: TreeNodeData
+  pathKey: string
+  selected: string | null
+  expanded: Record<string, boolean>
+}>();
+const emit = defineEmits<{
+  toggle: [pathKey: string]
+  select: [slug: string]
+}>();
 const { t } = useListingI18n();
 const hasChildren = computed(() => props.node.children && props.node.children.length > 0);
 const isExpanded = computed(() => props.expanded[props.pathKey] ?? true);

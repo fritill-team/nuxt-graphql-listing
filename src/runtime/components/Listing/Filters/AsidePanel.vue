@@ -1,13 +1,19 @@
-<script setup>
-const props = defineProps({
-  title: { type: String, required: false },
-  filters: { type: Object, required: true },
-  config: { type: Array, required: true },
-  facets: { type: [Object, null], required: false }
+<script setup lang="ts">
+import type { FilterFieldConfig, FieldKeyedFacets } from "../../../types/listing";
+const props = withDefaults(defineProps<{
+  title?: string
+  filters: Record<string, any>
+  config: FilterFieldConfig[]
+  facets?: FieldKeyedFacets | null
+}>(), {
+  title: undefined,
+  facets: undefined
 });
-const emit = defineEmits(["change"]);
-function onRendererChange(next) {
-  emit("change", next);
+const emit = defineEmits<{
+  change: [patch: Record<string, any>]
+}>();
+function onRendererChange(patch: Record<string, any>): void {
+  emit("change", patch);
 }
 </script>
 

@@ -1,4 +1,5 @@
-<script setup>
+<script setup lang="ts">
+import type { Component } from "vue";
 import Select from "./Field/Select.vue";
 import DateRangeGroup from "./Field/DateRangeGroup.vue";
 import DateRange from "./Field/DateRange.vue";
@@ -7,13 +8,18 @@ import SwitchGroup from "./Field/SwitchGroup.vue";
 import SwitchMulti from "./Field/SwitchMulti.vue";
 import Rating from "./Field/Rating.vue";
 import CategoryTree from "./Field/Category/Tree.vue";
-const props = defineProps({
-  filters: { type: null, required: true },
-  config: { type: Array, required: true },
-  facets: { type: null, required: false }
+import type { FilterFieldConfig, FieldKeyedFacets } from "../../../types/listing";
+const props = withDefaults(defineProps<{
+  filters: Record<string, any>
+  config: FilterFieldConfig[]
+  facets?: FieldKeyedFacets | null
+}>(), {
+  facets: undefined
 });
-const emit = defineEmits(["change"]);
-function resolveComponent(field) {
+const emit = defineEmits<{
+  change: [patch: Record<string, any>]
+}>();
+function resolveComponent(field: FilterFieldConfig): Component | undefined {
   if (field.kind === "custom" && "component" in field) {
     return field.component;
   }
@@ -38,17 +44,17 @@ function resolveComponent(field) {
       return CategoryTree;
   }
 }
-function getCustomProps(field) {
+function getCustomProps(field: FilterFieldConfig): Record<string, any> {
   if (field.kind === "custom" && "props" in field) {
     return field.props ?? {};
   }
   return {};
 }
-function getFacetProps(field) {
+function getFacetProps(field: FilterFieldConfig): Record<string, any> {
   if (!props.facets) return {};
   const fieldName = "field" in field ? field.field : null;
   if (!fieldName) return {};
-  const facetData = props.facets[fieldName];
+  const facetData = props.facets[fieldName] as any;
   if (facetData === void 0 || facetData === null) return {};
   if (field.kind === "decimal-range" || field.kind === "int-range") {
     return {
@@ -76,7 +82,7 @@ function getFacetProps(field) {
   }
   return {};
 }
-function onFieldChange(patch) {
+function onFieldChange(patch: Record<string, any>): void {
   emit("change", patch);
 }
 </script>

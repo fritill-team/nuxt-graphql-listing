@@ -1,12 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import { useListingI18n } from "../../../../composables/useListingI18n";
-const props = defineProps({
-  field: { type: Object, required: true },
-  filters: { type: Object, required: true }
-});
-const emit = defineEmits(["change"]);
+import type { SwitchGroupFilterFieldConfig } from "../../../../types/listing";
+const props = defineProps<{
+  field: SwitchGroupFilterFieldConfig
+  filters: Record<string, any>
+}>();
+const emit = defineEmits<{
+  change: [patch: Record<string, any>]
+}>();
 const { t } = useListingI18n();
-function onToggle(fieldKey, checked) {
+function onToggle(fieldKey: string, checked: boolean) {
   emit("change", {
     [fieldKey]: checked ? true : null
   });

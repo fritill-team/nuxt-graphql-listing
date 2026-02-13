@@ -1,13 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
 import { useListingI18n } from "../../../../composables/useListingI18n";
-const props = defineProps({
-  field: { type: Object, required: true },
-  filters: { type: Object, required: true },
-  facetOptions: { type: [Array, null], required: false }
+import type { RatingFilterFieldConfig, RatingFacet } from "../../../../types/listing";
+const props = withDefaults(defineProps<{
+  field: RatingFilterFieldConfig
+  filters: Record<string, any>
+  facetOptions?: RatingFacet[] | null
+}>(), {
+  facetOptions: undefined
 });
 const { t } = useListingI18n();
-const emit = defineEmits(["change"]);
+const emit = defineEmits<{
+  change: [patch: Record<string, any>]
+}>();
 const ratingSteps = computed(() => props.field.steps ?? [4, 3, 2, 1]);
 const facetCounts = computed(() => {
   if (!props.facetOptions?.length) return {};

@@ -112,12 +112,10 @@ const assetUrl = (assetId: string) => `/api/assets/${assetId}` // <- adjust
           <template #header>
             <div class="relative">
               <img
-                v-if="pickAsset(course)?.assetId"
-                :src="assetUrl(pickAsset(course)!.assetId)"
+                src="https://random.imagecdn.app/v1/image?width=500&height=150"
                 class="h-36 w-full object-cover"
                 alt=""
               />
-              <div v-else class="h-36 w-full bg-gray-100 dark:bg-gray-800"/>
 
               <div class="absolute top-3 left-3 flex gap-2">
                 <UBadge v-if="course.isLive" color="red" variant="solid">Live</UBadge>
@@ -185,13 +183,8 @@ const assetUrl = (assetId: string) => `/api/assets/${assetId}` // <- adjust
                 </template>
               </div>
 
-              <UButton
-                size="sm"
-                variant="soft"
-                :to="`/courses/${pickTranslation(course, locale)?.slug ?? course.id}`"
-              >
-                View
-              </UButton>
+
+
             </div>
           </div>
         </UCard>
@@ -203,12 +196,10 @@ const assetUrl = (assetId: string) => `/api/assets/${assetId}` // <- adjust
           <div class="flex gap-4">
             <div class="w-28 shrink-0">
               <img
-                v-if="pickAsset(course)?.assetId"
-                :src="assetUrl(pickAsset(course)!.assetId)"
+                src="https://random.imagecdn.app/v1/image?width=500&height=150"
                 class="h-20 w-28 object-cover rounded-lg"
                 alt=""
               />
-              <div v-else class="h-20 w-28 rounded-lg bg-gray-100 dark:bg-gray-800"/>
             </div>
 
             <div class="flex-1 min-w-0">
@@ -252,14 +243,6 @@ const assetUrl = (assetId: string) => `/api/assets/${assetId}` // <- adjust
                       <span class="text-gray-400">({{ course.reviewsCount ?? 0 }})</span>
                     </span>
                 </div>
-
-                <UButton
-                  size="sm"
-                  variant="soft"
-                  :to="`/courses/${pickTranslation(course, locale)?.slug ?? course.id}`"
-                >
-                  View
-                </UButton>
               </div>
             </div>
           </div>
