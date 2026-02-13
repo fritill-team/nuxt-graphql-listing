@@ -92,6 +92,10 @@ function onFilterChange(patch) {
           <slot name="top-bar-start"/>
         </template>
 
+        <template #before-end>
+          <slot name="top-bar-before-end"/>
+        </template>
+
         <template #end>
           <slot name="top-bar-end"/>
         </template>
