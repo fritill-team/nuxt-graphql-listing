@@ -43,7 +43,7 @@ const openDrawer = async () => {
     facets: props.facets
   });
   const result = await instance.result;
-  if (result.applied && result.filters) {
+  if (result?.applied && result.filters) {
     emit("update:filters", result.filters);
   }
 };
