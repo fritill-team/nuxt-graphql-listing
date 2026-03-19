@@ -57,19 +57,19 @@ export function parseListingQuery<
   for (const field of filterConfig) {
     if (field.kind === 'separator') continue
 
-    if (field.kind === 'select' || field.kind === 'boolean-select' || field.kind === 'category-tree') {
-      const paramKey = field.field as string
+    if (field.kind === 'select' || field.kind === 'boolean-select' || field.kind === 'category-tree' || field.kind === 'custom') {
+      const paramKey = ('field' in field ? field.field : field.key) as string
       const raw = firstOrNull(query[paramKey])
 
       if (raw == null || raw === '') continue
 
       if (field.kind === 'boolean-select') {
-        if (raw === 'true') (filters as any)[field.field] = true
-        else if (raw === 'false') (filters as any)[field.field] = false
+        if (raw === 'true') (filters as any)[paramKey] = true
+        else if (raw === 'false') (filters as any)[paramKey] = false
         continue
       }
 
-      ;(filters as any)[field.field] = raw
+      ;(filters as any)[paramKey] = raw
       continue
     }
 
@@ -193,8 +193,8 @@ export function buildListingQuery<
   for (const field of filterConfig) {
     if (field.kind === 'separator') continue
 
-    if (field.kind === 'select' || field.kind === 'boolean-select' || field.kind === 'category-tree') {
-      const paramKey = field.field as string
+    if (field.kind === 'select' || field.kind === 'boolean-select' || field.kind === 'category-tree' || field.kind === 'custom') {
+      const paramKey = ('field' in field ? field.field : field.key) as string
       const value = f[paramKey]
 
       if (value == null || value === '') {
