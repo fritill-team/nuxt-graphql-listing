@@ -109,6 +109,8 @@ export function useListing<
     filterKey = 'filters',
     wrapInput = true,
     extraFilters = {} as Partial<Filters>,
+    searchKey = 'search',
+    searchInFilters = false,
     mapResult: customMapResult,
   } = options
 
@@ -147,17 +149,33 @@ export function useListing<
     structuredClone(hydratedState.sort ?? initialSort) as Sort,
   )
 
+  const search = ref<string>(hydratedState.search ?? '')
+
   const state = computed<ListingState<Filters, Sort>>(() => ({
     offset: offset.value,
     limit: limit.value,
     filters: filters.value,
     sort: sort.value,
+    search: search.value,
   }))
 
   // ---------- Build variables ----------
   const variables = computed(() => {
     const resolvedExtraFilters = unref(extraFilters) ?? ({} as Partial<Filters>)
-    return defaultBuildVariables(state.value, filterKey, wrapInput, resolvedExtraFilters)
+    const vars = defaultBuildVariables(state.value, filterKey, wrapInput, resolvedExtraFilters)
+
+    // Add search to variables
+    const searchValue = search.value?.trim()
+    if (searchValue) {
+      const target = wrapInput ? vars.input : vars
+      if (searchInFilters) {
+        target[filterKey] = {...(target[filterKey] ?? {}), [searchKey]: searchValue}
+      } else {
+        target[searchKey] = searchValue
+      }
+    }
+
+    return vars
   })
 
   // ---------- Map result ----------
@@ -239,6 +257,10 @@ export function useListing<
         if (parsed.sort && !deepEqual(parsed.sort, sort.value)) {
           sort.value = parsed.sort as Sort
         }
+        const parsedSearch = parsed.search ?? ''
+        if (parsedSearch !== search.value) {
+          search.value = parsedSearch
+        }
       },
     )
   }
@@ -269,6 +291,11 @@ export function useListing<
     offset.value = 0
   }
 
+  function setSearch(value: string) {
+    search.value = value
+    offset.value = 0
+  }
+
   return {
     items,
     total,
@@ -277,12 +304,14 @@ export function useListing<
     limit,
     filters,
     sort,
+    search,
     loading: pending as Ref<boolean>,
     error: computed(() => (error.value as any) ?? null),
     setFilter,
     setSort,
     setOffset,
     setLimit,
+    setSearch,
     refetch: fetchData,
   } as UseListingReturn<Item, Filters, Sort, Facets>
 }

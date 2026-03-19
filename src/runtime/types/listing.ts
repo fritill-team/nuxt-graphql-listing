@@ -278,6 +278,12 @@ export interface UseListingOptions<
   /** Extra filters to merge with state filters (not synced to URL) */
   extraFilters?: Partial<Filters> | Ref<Partial<Filters>>
 
+  /** GraphQL variable name for search (default: 'search') */
+  searchKey?: string
+
+  /** If true, search is sent inside filters[searchKey] instead of as a top-level variable (default: false) */
+  searchInFilters?: boolean
+
   /**
    * Custom result mapper (advanced)
    * Override auto-mapping from dataPath
@@ -295,9 +301,11 @@ export interface UseListingReturn<Item, Filters, Sort, Facets = Record<string, a
   sort: Ref<Sort>
   loading: Ref<boolean>
   error: Ref<Error | null>
+  search: Ref<string>
   setFilter: (patch: Partial<Filters>) => void
   setSort: (sort: Sort) => void
   setOffset: (offset: number) => void
   setLimit: (limit: number) => void
+  setSearch: (value: string) => void
   refetch: () => Promise<void>
 }
