@@ -4,6 +4,8 @@ export default {
     apply: 'Apply',
     clear: 'Clear',
     categories: 'Categories',
+    uncategorized: 'Uncategorized',
+    allCategories: 'All Categories',
     noCategories: 'No categories available',
     expand: 'Expand',
     collapse: 'Collapse',

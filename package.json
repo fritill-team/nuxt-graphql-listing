@@ -7,7 +7,6 @@
     "url": "git+https://github.com/fritill-team/nuxt-graphql-listing.git"
   },
   "license": "MIT",
-  "packageManager": "yarn@1.22.22",
   "type": "module",
   "exports": {
     ".": {

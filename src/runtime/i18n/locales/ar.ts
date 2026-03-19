@@ -6,6 +6,8 @@ export default {
     cancel: 'إلغاء',
     reset: 'إعادة ضبط',
     categories: 'التصنيفات',
+    uncategorized: 'غير مصنف',
+    allCategories: 'جميع التصنيفات',
     noCategories: 'لا توجد تصنيفات متاحة',
     expand: 'توسيع',
     collapse: 'طي',
