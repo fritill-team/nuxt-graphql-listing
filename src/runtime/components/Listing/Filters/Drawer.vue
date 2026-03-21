@@ -2,6 +2,7 @@
 import Renderer from "./Renderer.vue";
 import {ref, toRaw, watch} from "vue";
 import type {FieldKeyedFacets, FilterFieldConfig} from "../../../types/listing";
+import {useListingI18n} from "../../../composables/useListingI18n";
 
 interface DrawerResult {
   applied: boolean
