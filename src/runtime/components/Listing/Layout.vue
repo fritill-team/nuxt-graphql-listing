@@ -89,14 +89,17 @@ function onFilterChange(patch: Record<string, any>): void {
 
 <template>
   <div class="grid grid-cols-1 gap-4 md:grid-cols-12 w-full">
-    <!-- Desktop Filters (md+) -->
-    <LazyListingFiltersAsidePanel
-      v-if="showSidebar"
-      :filters="filters"
-      :config="filtersConfig"
-      :facets="facets"
-      @change="onFilterChange"
-    />
+    <!-- Sidebar column: optional slot above + desktop filters -->
+    <div v-if="showSidebar" class="hidden md:flex md:flex-col md:col-span-3 gap-4">
+      <slot name="sidebar-above"/>
+      <LazyListingFiltersAsidePanel
+        :filters="filters"
+        :config="filtersConfig"
+        :facets="facets"
+        @change="onFilterChange"
+      />
+      <slot name="sidebar-below"/>
+    </div>
 
     <!-- Content -->
     <div :class="['space-y-4', showSidebar ? 'md:col-span-9' : 'md:col-span-12']">
