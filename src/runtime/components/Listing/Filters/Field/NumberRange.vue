@@ -34,12 +34,18 @@ watch(
 );
 const sliderModel = computed({
   get() {
-    return [localGte.value ?? minBound.value, localLte.value ?? maxBound.value];
+    return [
+      toRangeBound(localGte.value) ?? minBound.value,
+      toRangeBound(localLte.value) ?? maxBound.value
+    ];
   },
   set(values: number[]) {
     const [min, max] = values;
-    localGte.value = sliderEndToBound(min, minBound.value);
-    localLte.value = sliderEndToBound(max, maxBound.value);
+    const [shownMin, shownMax] = sliderModel.value;
+    // Only the thumb that moved changes its end: the facet follows the applied
+    // filter, so an applied bound can rest on the track end and must survive.
+    if (min !== shownMin) localGte.value = sliderEndToBound(min, minBound.value);
+    if (max !== shownMax) localLte.value = sliderEndToBound(max, maxBound.value);
   }
 });
 function onSubmit() {

@@ -7,7 +7,8 @@ export interface RangeValue {
 
 /** An empty, missing or non-numeric box is no bound, never 0. */
 export function toRangeBound(value: unknown): RangeBound {
-  if (value === null || value === undefined || value === '') return null
+  if (value === null || value === undefined) return null
+  if (typeof value === 'string' && value.trim() === '') return null
   const n = typeof value === 'number' ? value : Number(value)
   return Number.isFinite(n) ? n : null
 }

@@ -3,7 +3,7 @@ import { buildRangeValue, sliderEndToBound, toRangeBound } from '../../src/runti
 
 describe('toRangeBound', () => {
   it('treats empty, missing and non-numeric input as no bound', () => {
-    for (const v of ['', null, undefined, Number.NaN, 'abc', Number.POSITIVE_INFINITY]) {
+    for (const v of ['', '  ', null, undefined, Number.NaN, 'abc', Number.POSITIVE_INFINITY]) {
       expect(toRangeBound(v)).toBeNull()
     }
   })
