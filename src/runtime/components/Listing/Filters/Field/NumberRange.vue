@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useListingI18n } from "../../../../composables/useListingI18n";
+import { buildRangeValue, sliderEndToBound, toRangeBound } from "../../../../utils/range";
+import type { RangeBound } from "../../../../utils/range";
 import type { RangeFilterFieldConfig } from "../../../../types/listing";
 const props = withDefaults(defineProps<{
   field: RangeFilterFieldConfig
@@ -17,50 +19,43 @@ const emit = defineEmits<{
 const { t } = useListingI18n();
 const minBound = computed(() => props.facetMin ?? 0);
 const maxBound = computed(() => props.facetMax ?? 1e3);
-const localGte = ref(0);
-const localLte = ref(0);
+// null = the user left this end empty: no limit. The facet bounds are only
+// placeholders and slider track ends, never a value that gets submitted.
+const localGte = ref<RangeBound>(null);
+const localLte = ref<RangeBound>(null);
 watch(
   () => props.filters[props.field.field],
   (val) => {
     const v = val ?? {};
-    localGte.value = v.gte ?? minBound.value;
-    localLte.value = v.lte ?? maxBound.value;
+    localGte.value = toRangeBound(v.gte);
+    localLte.value = toRangeBound(v.lte);
   },
   { immediate: true, deep: true }
 );
-watch(
-  [() => props.facetMin, () => props.facetMax],
-  () => {
-    const current = props.filters[props.field.field];
-    if (!current?.gte) localGte.value = minBound.value;
-    if (!current?.lte) localLte.value = maxBound.value;
-  }
-);
 const sliderModel = computed({
   get() {
-    return [localGte.value ?? minBound.value, localLte.value ?? maxBound.value];
+    return [
+      toRangeBound(localGte.value) ?? minBound.value,
+      toRangeBound(localLte.value) ?? maxBound.value
+    ];
   },
-  set(values) {
+  set(values: number[]) {
     const [min, max] = values;
-    localGte.value = min !== void 0 && Number.isFinite(min) ? min : minBound.value;
-    localLte.value = max !== void 0 && Number.isFinite(max) ? max : maxBound.value;
+    const [shownMin, shownMax] = sliderModel.value;
+    // Only the thumb that moved changes its end: the facet follows the applied
+    // filter, so an applied bound can rest on the track end and must survive.
+    if (min !== shownMin) localGte.value = sliderEndToBound(min, minBound.value);
+    if (max !== shownMax) localLte.value = sliderEndToBound(max, maxBound.value);
   }
 });
 function onSubmit() {
-  const patch = {};
-  if (localGte.value == null && localLte.value == null) {
-    patch[props.field.field] = null;
-  } else {
-    patch[props.field.field] = {
-      gte: localGte.value,
-      lte: localLte.value
-    };
-  }
-  emit("change", patch);
+  emit("change", {
+    [props.field.field]: buildRangeValue(localGte.value, localLte.value)
+  });
 }
 function onClear() {
-  localGte.value = minBound.value;
-  localLte.value = maxBound.value;
+  localGte.value = null;
+  localLte.value = null;
   emit("change", {
     [props.field.field]: null
   });
